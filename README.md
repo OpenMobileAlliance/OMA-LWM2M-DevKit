@@ -18,11 +18,11 @@ This way, developers and users can interactively explore and comprehend the new 
 
 ## Installation
 ### Release version
-The OMA LWM2M DevKit is published on the Mozilla [https://addons.mozilla.org/firefox/addon/oma-lwm2m-devkit/](Add-ons for Firefox) Web site, which provides direct installation.
+The OMA LWM2M DevKit is published on the Mozilla [Add-ons for Firefox](https://addons.mozilla.org/firefox/addon/oma-lwm2m-devkit/) Web site, which provides direct installation.
 ### Developer version
 The developer version uses a cloned Git repository to directly inject the source code. This allows for the latest snapshot versions and customizations of the add-on. The installation process is as follows:
 1. Get the sources from Github: `clone git://github.com/OpenMobileAlliance/OMA-LWM2M-DevKit.git`
-2. Add a text file named `lwm2m-devkit@openmobilealliance.org` to your profile's extension directory. You can also use the [https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles](Profile Manager) to create a new profile for add-on development.
+2. Add a text file named `lwm2m-devkit@openmobilealliance.org` to your profile's extension directory. You can also use the [Profile Manager](https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles) to create a new profile for add-on development.
  - Windows: `C:\Users\<username>\AppData\Roaming\Mozilla\Firefox\Profiles\xxxxxxxx.default\extensions\`
  - Linux: `~/.mozilla/firefox/xxxxxxxx.default/extensions/`
  - MacOS: `~/Library/Application Support/Firefox/Profiles/xxxxxxxx.default/extensions/`
