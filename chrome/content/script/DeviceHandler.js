@@ -486,7 +486,6 @@ Lwm2mDevKit.addResourceRow = function(name, value, attributes, obj, ins, res, id
 	cell = document.createElement('listcell');
 	let type = Lwm2mDevKit.objectDefinitions[obj].resources[res].type;
 	
-
 	var input = document.createElement('textbox');
 	input.setAttribute('flex', '1');
 	input.setAttribute('class', 'resvalue');
@@ -502,12 +501,15 @@ Lwm2mDevKit.addResourceRow = function(name, value, attributes, obj, ins, res, id
 	row.appendChild(cell);
 
 	cell = document.createElement('listcell');
-	cell.pack = "center";
-	var button = document.createElement('button');
-	button.setAttribute('class', 'special-button');
-	button.setAttribute('label', 'Notify');
-	button.addEventListener('command', function() { Lwm2mDevKit.InformationReporting.notify([obj,ins,res].join('/')); });
-	cell.appendChild(button);
+	
+	if ( Lwm2mDevKit.objectDefinitions[obj].resources[res].operations.indexOf('R')!=-1) {
+		cell.pack = "center";
+		var button = document.createElement('button');
+		button.setAttribute('class', 'special-button');
+		button.setAttribute('label', 'Notify');
+		button.addEventListener('command', function() { Lwm2mDevKit.InformationReporting.notify([obj,ins,res].join('/')); });
+		cell.appendChild(button);
+	}
 	row.appendChild(cell);
 
 	return row;
