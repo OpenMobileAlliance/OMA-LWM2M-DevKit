@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2015, Institute for Pervasive Computing, ETH Zurich.
+  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. Neither the name of the Institute nor the names of its contributors
+     may be used to endorse or promote products derived from this software
+     without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS "AS IS" AND
+  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  SUCH DAMAGE.
+ 
+  This file is part of the OMA LWM2M DevKit.
+-->
+
+<!DOCTYPE main SYSTEM "chrome://lwm2m-devkit/locale/translations.dtd">
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="chrome://lwm2m-devkit/skin/classic.css" type="text/css"?>
+
+<window id         = "lwm2m-devkit-main-window"
+        title      = "OMA LWM2M DevKit - Client"
+        orient     = "vertical"
+        xmlns      = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html = "http://www.w3.org/1999/xhtml"
+        onload     = "Lwm2mDevKit.main()"
+        onunload   = "Lwm2mDevKit.unload()">
+
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/namespace.js" />
+	
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/copper/TransactionHandler.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/copper/UdpClient.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/copper/CoapRFC7252.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/copper/CoapMessage.js"/>
+	
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/Helpers.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/DeviceHandler.js" />
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/CoapHandlers.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/Logger.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/Tooltips.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/EncodingTLV.js"/>
+	
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/InterfaceRegistration.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/InterfaceDeviceManagement.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/InterfaceInformationReporting.js"/>
+	
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/main.js" />
+	
+	
+	<keyset>
+		<key key="h" oncommand="Lwm2mDevKit.Tooltips.help();" />
+		<key key="e" oncommand="Lwm2mDevKit.loadDefaultLWM2MDevice();" />
+		<key key="r" oncommand="if (Lwm2mDevKit.client!=null) Lwm2mDevKit.Registration.register();" />
+		<key key="c" oncommand="Lwm2mDevKit.enableCreateRows();" />
+	</keyset>
+	
+	<panel id="tooltip" consumeoutsideclicks="false" noautofocus="true" class="tooltip" style="opacity: 0.8; font-size: 18px; cursor: pointer; -moz-appearance: none; height: 200px; width: 200px; background-color: #BB3C36; color: white; border-radius: 100px; border: 3px solid white;">
+	<vbox flex="1" align="center" pack="center" style="cursor: inherit;">
+		<html:div id="tooltiptext" style="text-align: center; margin: 5px; white-space: pre-wrap; cursor: inherit;"></html:div>
+	</vbox>
+	</panel>
+
+	<panel id="panel_ping" class="interface full" position="bottomleft topleft">
+		<vbox>
+			<description id="ping_info" style="width: 10em; color: #CC0000; white-space: pre-wrap;">The remote address does not respond to CoAP ping: CON-EMPTY timed out</description>
+			<separator />
+			<label control="local_address" value="Device Address" />
+			<textbox id="local_address" readonly="true" style="text-align: center;" />
+		</vbox>
+	</panel>
+
+	<panel id="panel_device_loading" class="interface full" position="bottomright topright">
+		<vbox>
+			<button id="example_client" class="special-button" label="Example Client"
+				accesskey="E"
+				oncommand="Lwm2mDevKit.loadDefaultLWM2MDevice(); document.getElementById('panel_device_loading').hidePopup();" />
+			<separator />
+			<button id="load_from_file" class="special-button" label="New Client"
+				accesskey="N"
+				oncommand="alert('Custom objects and devices will be available soon...');" />
+		</vbox>
+	</panel>
+
+	<panel id="panel_bootstrap" class="interface" position="bottomleft topleft" onpopupshowing="event.preventDefault();"></panel>
+	
+	<panel id="panel_registration" class="interface" position="bottomleft topleft" onpopupshowing="if (Lwm2mDevKit.client==null) event.preventDefault();">
+		<hbox flex="1">
+			<vbox width="180">
+				<button id="register" class="special-button" label="Register" accesskey="R" oncommand="Lwm2mDevKit.Registration.register();" />
+				<separator />
+				<button id="update" class="special-button" label="Update" disabled="true" accesskey="U" oncommand="Lwm2mDevKit.Registration.update();" />
+				<separator />
+				<button id="deregister" class="special-button" label="De-register" disabled="true" accesskey="D" oncommand="Lwm2mDevKit.Registration.deregister();" />
+				<spacer flex="1"/>
+				<vbox id="handle_box" hidden="true">
+				<label control="handle" value="Handle for Updates" />
+				<textbox id="handle" readonly="true" style="text-align: center;" />
+				<label control="last_update" value="Last Update" />
+				<textbox id="last_update" readonly="true" style="text-align: center;" />
+				<label control="scheduled_update" value="Scheduled Update in" />
+				<textbox id="scheduled_update" readonly="true" style="text-align: center;" />
+				</vbox>
+			</vbox>
+
+			<separator height="100%" orient="vertical" class="groove" />
+
+			<vbox flex="1" width="180">
+				<label control="endpoint_name" value="Endpoint Client Name (required)" />
+				<textbox id="endpoint_name" />
+				<separator />
+				<label control="lifetime" value="Lifetime" />
+				<textbox id="lifetime" type="number" value="86400" maxlength="8" />
+				<separator />
+				<label control="version" value="LWM2M Version" />
+				<textbox id="version" value="1.0" />
+				<separator />
+				<label control="binding" disabled="true" value="Binding Mode" />
+				<menulist id="binding">
+					<menupopup>
+						<menuitem label="UDP (U)" value="U" />
+						<menuitem label="UDP with Queue Mode (UQ)" value="UQ"
+							disabled="true" />
+						<menuitem label="SMS (S)" value="S" disabled="true" />
+						<menuitem label="SMS with Queue Mode (SQ)" value="SQ"
+							disabled="true" />
+						<menuitem label="UDP and SMS (US)" value="US" disabled="true" />
+						<menuitem label="UDP with Queue Mode and SMS (UQS)"
+							value="UQS" disabled="true" />
+					</menupopup>
+				</menulist>
+				<separator />
+				<label control="sms_no" disabled="true" value="SMS Number" />
+				<textbox id="sms_no" disabled="true" />
+				
+				<!-- At some point we might need to consider multiple registration (one per LWM2M Server Object instance) -->
+			</vbox>
+		</hbox>
+	</panel>
+
+	<panel id="panel_service" class="interface" position="bottomleft topleft" onpopupshowing="if (Lwm2mDevKit.registrationHandle==null) event.preventDefault();">
+		<vbox style="width: 45em;">
+			<groupbox flex="1">
+				<caption label="Operation Log" />
+				
+				<listbox id="log_operations" flex="1" rows="5" onselect="Lwm2mDevKit.showOperation(this.selectedIndex); Lwm2mDevKit.Tooltips.nextStep();">
+					<listhead>
+						<listheader label="Time" style="width: 4.5em;" />									
+						<listheader label="Operation" style="width: 10em;" />
+						<listheader label="Path" style="width: 6em;" />
+						<listheader label="Outcome" />
+					</listhead>
+					<listcols>
+						<listcol />
+						<listcol />
+						<listcol />
+						<listcol flex="1" />
+					</listcols>
+				</listbox>
+			</groupbox>
+			<groupbox flex="1">
+				<caption label="LWM2M Server Request (CoAP)" />
+				<hbox flex="1">
+					<listbox id="log_server_request_header" rows="4" style="width: 14em;">
+					    <listcols>
+					        <listcol />
+					        <listcol flex="1"/>
+					    </listcols>
+					    <listboxbody style="overflow: hidden;">
+					    <listhead>
+					        <listheader label="Header" style="width: 4em;" />
+					        <listheader label="Value" />
+					    </listhead>
+					    <listitem>
+					        <listcell label="Type"/>
+					        <listcell id="log_server_request_header_type"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="Code"/>
+					        <listcell id="log_server_request_header_code"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="MID"/>
+					        <listcell id="log_server_request_header_tid"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="Token"/>
+					        <listcell id="log_server_request_header_token"/>
+					    </listitem>
+					    <listitem></listitem>
+					    </listboxbody>
+					</listbox>
+					
+					<listbox id="log_server_request_options" flex="1" rows="4">
+					    <listhead>
+					        <listheader label="Option"/>
+					        <listheader label="Value"/>
+					        <!-- <listheader label="Info"/> -->
+					    </listhead>
+					    <listcols>
+					        <listcol flex="1"/>
+					        <listcol flex="2"/>
+					        <!-- <listcol flex="1"/> -->
+					    </listcols>
+					</listbox>
+				</hbox>
+				<textbox id="log_server_request_payload" readonly="true" multiline="true" rows="2" style="color: silver; font-family: monospace; font-size: 100%;" value="Request Payload" />
+			</groupbox>
+			<groupbox>
+				<caption label="LWM2M Client Response (CoAP)" />
+				<hbox flex="1">
+					<listbox id="log_client_response_header" rows="4" style="width: 14em;">
+					    <listcols>
+					        <listcol />
+					        <listcol flex="1"/>
+					    </listcols>
+					    <listboxbody style="overflow: hidden;">
+					    <listhead>
+					        <listheader label="Header" style="width: 4em;" />
+					        <listheader label="Value" />
+					    </listhead>
+					    <listitem>
+					        <listcell label="Type"/>
+					        <listcell id="log_client_response_header_type"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="Code"/>
+					        <listcell id="log_client_response_header_code"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="MID"/>
+					        <listcell id="log_client_response_header_tid"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="Token"/>
+					        <listcell id="log_client_response_header_token"/>
+					    </listitem>
+					    <listitem></listitem>
+					    </listboxbody>
+					</listbox>
+				
+					<listbox id="log_client_response_options" flex="1" rows="4">
+					    <listhead>
+					        <listheader label="Option"/>
+					        <listheader label="Value"/>
+					        <!-- <listheader label="Info"/> -->
+					    </listhead>
+					    <listcols>
+					        <listcol flex="1"/>
+					        <listcol flex="2"/>
+					        <!-- <listcol flex="1"/> -->
+					    </listcols>
+					</listbox>
+				</hbox>
+				<textbox id="log_client_response_payload" readonly="true" multiline="true" rows="2" style="color: silver; font-family: monospace; font-size: 100%;" value="Response Payload" />
+			</groupbox>
+		</vbox>
+	</panel>
+
+	<panel id="panel_reporting" class="interface" position="bottomleft topleft" onpopupshowing="if (Lwm2mDevKit.registrationHandle==null) event.preventDefault();">
+		<vbox flex="1">
+			<groupbox>
+				<caption label="Observe Relations" />
+				<listbox id="reporting_relations" rows="3" flex="1">
+					<listhead>
+						<listheader label="Token" style="width: 12em;" />
+						<listheader label="Path" style="width: 6em;" />
+						<listheader label="Seq. Num." style="width: 6em;" />
+					</listhead>
+				    <listcols>
+				        <listcol flex="2"/>
+				        <listcol flex="1"/>
+				        <listcol flex="1"/>
+				    </listcols>
+				</listbox>
+			</groupbox>
+			<groupbox>
+				<caption label="Operation Log" />
+				<listbox id="log_operations_reporting"  style="width: 28em;" rows="5" onselect="Lwm2mDevKit.showOperationReporting(this.selectedIndex); Lwm2mDevKit.Tooltips.nextStep();">
+					<listhead>
+						<listheader label="Time" style="width: 4.5em;" />									
+						<listheader label="Operation" style="width: 10em;" />
+						<listheader label="Path" style="width: 6em;" />
+						<listheader label="Outcome" />
+					</listhead>
+					<listcols>
+						<listcol />
+						<listcol />
+						<listcol />
+						<listcol flex="1" />
+					</listcols>
+				</listbox>
+			</groupbox>
+			<groupbox>
+				<caption label="LWM2M Client Notification (CoAP)" />
+				<hbox flex="1">
+					<listbox id="log_client_response_header" rows="4" style="width: 14em;">
+					    <listcols>
+					        <listcol />
+					        <listcol flex="1"/>
+					    </listcols>
+					    <listboxbody style="overflow: hidden;">
+					    <listhead>
+					        <listheader label="Header" style="width: 4em;" />
+					        <listheader label="Value" />
+					    </listhead>
+					    <listitem>
+					        <listcell label="Type"/>
+					        <listcell id="log_notify_header_type"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="Code"/>
+					        <listcell id="log_notify_header_code"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="MID"/>
+					        <listcell id="log_notify_header_tid"/>
+					    </listitem>
+					    <listitem>
+					        <listcell label="Token"/>
+					        <listcell id="log_notify_header_token"/>
+					    </listitem>
+					    <listitem></listitem>
+					    </listboxbody>
+					</listbox>
+				
+					<listbox id="log_notify_options" flex="1" rows="4">
+					    <listhead>
+					        <listheader label="Option"/>
+					        <listheader label="Value"/>
+					        <listheader label="Info"/>
+					    </listhead>
+					    <listcols>
+					        <listcol flex="1"/>
+					        <listcol flex="2"/>
+					        <listcol flex="1"/>
+					    </listcols>
+					</listbox>
+				</hbox>
+				<textbox id="log_notify_payload" readonly="true" multiline="true" rows="2" style="color: silver; font-family: monospace;" value="Notification Payload" />
+			</groupbox>
+		</vbox>
+	</panel>
+	
+	<panel id="panel_event_log" class="interface full">
+		<textbox id="log_event_log" flex="1" readonly="true" multiline="true" rows="10" style="-moz-appearance: none; font-family: monospace; color: lightgray; background-color: black; border: 1px solid white;" />
+	</panel>
+	
+<!-- ###################################################################### -->
+<!-- ###################################################################### -->
+<!-- ###################################################################### -->
+
+	<hbox flex="1">
+		<!-- content = resource tree + message pane -->
+		<vbox style="width: 20em; background-color: rgb(72,72,72);" id="sidebar">
+			<box pack="center" style="overflow: hidden; background-color: white; min-height: 60px;" height="60">
+				<image src="chrome://lwm2m-devkit/skin/oma-logo.png" style="width: 20em;" />
+			</box>
+			<box pack="center" style="overflow: hidden;">
+				<image src="chrome://lwm2m-devkit/skin/lwm2m-devkit-logo.png" style="width: 20em;" ondblclick="document.getElementById('panel_event_log').openPopup(document.getElementById('main_content'), 'overlap', 10, 65);" />
+			</box>
+
+			<hbox>
+				<button id="button_ping" style="min-width: 5em;" class="special-button" label="Ping" disabled="true" popup="panel_ping" />
+				<button id="button_load_device" flex="1" class="special-button" label="Load LWM2M Client" popup="panel_device_loading" />
+			</hbox>
+			
+			<!-- resource tree -->
+			<groupbox id="group_object_tree" flex="1">
+				<caption id="caption_device" label="Objects"
+					style="color:white;background-color: rgb(72,72,72);" />
+				<tree id="tree_device" flex="1" treelines="true" seltype="single"
+					hidecolumnpicker="true"
+					disableKeyNavigation="true"
+					tooltiptext="Click on 'Load Device' to load a device and view objects"
+					onclick="Lwm2mDevKit.onTreeClicked(event); Lwm2mDevKit.Tooltips.nextStep();"
+					onmousemove="Lwm2mDevKit.onTreeHover(event);">
+					<treecols>
+						<treecol primary="true" hideheader="true" flex="1" />
+						<treecol hideheader="true" hidden="true" flex="1"/>
+					</treecols>
+
+					<treechildren id="tree_children" tooltiptext=""></treechildren>
+				</tree>
+			</groupbox>
+		</vbox>
+
+		<splitter resizebefore="farthest" id="resource_split" />
+		
+<!-- ###################################################################### -->
+<!-- ###################################################################### -->
+<!-- ###################################################################### -->
+
+		<!-- message pane -->
+		<vbox flex="1" id="main_content">
+			<!-- interfaces -->
+			<hbox id="interface_buttons" height="60" style="color: white; background-color: rgb(72,72,72); min-height: 60px;">
+				<button id="button_bootstrap" class="special-button" label="Bootstrap" popup="panel_bootstrap" disabled="true" />
+				<button id="button_registration" class="special-button" label="Client Registration" popup="panel_registration" disabled="true" />
+				<button id="button_service" class="special-button" label="Device Management &amp; Service Enablement" popup="panel_service" disabled="true" />
+				<button id="button_reporting" class="special-button" label="Information Reporting" popup="panel_reporting" disabled="true" />
+				<separator flex="1" />
+				<button id="button_preferences" class="special-button" style="width: 3.3em; min-width: 3.3em;" oncommand="window.openDialog('chrome://lwm2m-devkit/content/options.xul', 'Prefs', 'chrome,titlebar,toolbar,centerscreen,modal'); Lwm2mDevKit.loadBehavior();"><label style="margin: -16px 0 -10px 0; font-size: 220%;" value="≡" /></button>
+			</hbox>
+			
+			<box id="box_startup" flex="1" style="background-image: url('chrome://lwm2m-devkit/skin/lwm2m-devkit-logo.png'); background-repeat: no-repeat; background-position: center center;">	
+			</box>
+
+			<!-- object data -->
+			<box id="box_object_definitions" hidden="true">
+				<groupbox id="group_parent_object" flex="1">
+					<caption label="Object Definition" />
+					<richlistbox flex="1" >
+						<grid flex="1">
+							<columns>
+								<column style="width: 5.5em;" />
+								<column style="width: 14em;" />
+								<column style="width: 6em;" />
+								<column style="width: 6em;" />
+								<column flex="1" />
+								<column style="width: 20em;" />
+							</columns>
+							<rows style="overflow: hidden;">
+								<row>
+									<listheader style="text-align: center;" label="Object ID" />
+									<listheader label="Name" />
+									<listheader style="text-align: center;" label="Instances" />
+									<listheader style="text-align: center;" label="Mandatory" />
+									<listheader label="Description" />
+									<listheader label="Instances" />
+								</row>
+								<row style="height: 2em; font-size: 120%; font-weight: bold;">
+									<listcell id="object_id" style="text-align: center;" />
+									<listcell id="object_name" style="" />
+									<listcell id="object_instances" style="text-align: center;" />
+									<listcell id="object_mandatory" style="text-align: center;" />
+									<listcell id="object_desc" style="font-size: 80%; font-weight: normal;" />
+									<!-- needs box to render correctly (otherwise empty space before buttons) -->
+									<listcell style="font-size: 80%; font-weight: normal;"><box id="object_instantiate" flex="1"></box></listcell>
+								</row>
+							</rows>
+						</grid>
+					</richlistbox>
+				</groupbox>
+			</box>
+			<box id="box_object_instance" hidden="true">
+				<groupbox id="group_object_instance" flex="1">
+					<caption label="Object Instance" />
+					<richlistbox flex="1" >
+						<grid flex="1">
+							<columns>
+								<column style="width: 5.5em;" />
+								<column style="width: 14em;" />
+								<column style="width: 6em;" />
+								<column flex="1" />
+								<column flex="1" />
+							</columns>
+							<rows style="overflow: hidden;">
+								<row>
+									<listheader style="text-align: center;" label="Object ID" />
+									<listheader label="Name" />
+									<listheader style="text-align: center;" label="Instance ID" />
+									<listheader label="Object Attributes" />
+									<listheader label="Object Instance Attributes" />
+								</row>
+								<row style="height: 2em; font-size: 120%; font-weight: bold;">
+									<listcell id="object_instance_parent_id" style="text-align: center;" />
+									<listcell id="object_instance_name" />
+									<listcell id="object_instance_id" style="text-align: center;" />
+									<listcell id="object_instance_object_attribs" />
+									<listcell id="object_instance_instance_attribs" />
+								</row>
+							</rows>
+						</grid>
+					</richlistbox>
+				</groupbox>
+			</box>
+
+<!-- ###################################################################### -->
+<!-- ###################################################################### -->
+<!-- ###################################################################### -->
+
+			<box id="box_resource_definitions" hidden="true" flex="1">			
+				<groupbox id="group_resource" flex="1">
+					<caption id="resource" label="Resource Definitions" />
+	
+					<richlistbox flex="1" >
+						<grid flex="1">
+							<columns>
+								<column style="width: 5.5em;" />
+								<column style="width: 14em;" />
+								<column style="width: 6em;" />
+								<column style="width: 6em;" />
+								<column style="width: 6em;" />
+								<column style="width: 7em;" />
+								<column style="width: 5em;" />
+								<column style="width: 4em;" />
+								<column flex="1" />
+							</columns>
+							<rows id="resource_definitions">
+								<row>
+									<listheader id="resource_id" style="text-align: center;" label="Res. ID" />
+									<listheader id="resource_name" label="Name" />
+									<listheader id="resource_instances" style="text-align: center;" label="Instances" />
+									<listheader id="resource_mandatory" style="text-align: center;" label="Mandatory" />
+									<listheader id="resource_operation" style="text-align: center;" label="Operations" />
+									<listheader id="resource_type" label="Type" />
+									<listheader id="resource_range" label="Range" />
+									<listheader id="resource_units" label="Units" />
+									<listheader id="resource_desc" label="Description" />
+								</row>
+							</rows>
+						</grid>
+					</richlistbox>
+				</groupbox>
+			</box>
+			<box id="box_resource_values" hidden="true" flex="1">
+				<groupbox id="group_resource" flex="1">
+					<caption id="resource" label="Resource Instances" />
+					
+					<!-- textbox and button requires richlistbox, but richlistbox does not support multicolumns, hence grid -->
+					<richlistbox flex="1">
+						<grid flex="1">
+							<columns>
+								<column style="width: 5.5em;" />
+								<column style="width: 14em;" />
+								<column style="width: 6em;" />
+								<column style="width: 20em;" />
+								<column flex="1" />
+								<column style="width: 11em;" />
+							</columns>
+							<rows id="resource_values">
+								<row>
+									<!-- TODO: Current namespace for the XUL element IDs is not nice -->
+									<listheader id="value_resource_id" style="text-align: center;" label="Res. ID" />
+									<listheader id="value_resource_name" label="Name" />
+									<listheader id="value_resource_instance_id" style="text-align: center;" label="Instance ID" />
+									<listheader id="value_resource_value" label="Value" />
+									<!-- TODO: We need to find a good system to display the attributes.
+										They can also be set for whole instances or even whole objects.
+										So a column here is not very useful. 
+										Can we somehow show attributes instead of notes, since notes seem to be redundant?-->
+									<listheader id="value_resource_attributes" label="Attributes" />
+									<!-- TODO: A notify here must also trigger notifications for
+										observed instances and objects. Thus, choose the data model wisely... -->
+									<listheader id="value_resource_notify" label="Information Reporting" />
+								</row>
+							</rows>
+						</grid>
+					</richlistbox>
+				</groupbox>
+			</box>
+			
+<!-- ###################################################################### -->
+<!-- ###################################################################### -->
+<!-- ###################################################################### -->
+			
+			<splitter collapse="after" resizebefore="closest">
+				<grippy/>
+			</splitter>
+			
+			<box height="130">
+			
+			<groupbox flex="1">
+				<caption label="CoAP Message Log" />
+				
+				<listbox id="log_messages" flex="1">
+					<listhead>
+						<listheader label="Time" style="width: 4.5em;" />									
+						<listheader label="CoAP Message" style="width: 10em;" />
+						<listheader label="MID" style="width: 4.5em;" />
+						<listheader label="Token" style="width: 6em;" />
+						<listheader label="Options" />
+						<listheader label="Payload" />
+					</listhead>
+					<listcols>
+						<listcol />
+						<listcol />
+						<listcol />
+						<listcol />
+						<listcol flex="1" />
+						<listcol flex="1" />
+					</listcols>
+				</listbox>
+			</groupbox>
+			</box>
+			
+		</vbox>
+	</hbox>
+</window>

@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+  Copyright (c) 2015, Institute for Pervasive Computing, ETH Zurich.
+  All rights reserved.
+  
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. Neither the name of the Institute nor the names of its contributors
+     may be used to endorse or promote products derived from this software
+     without specific prior written permission.
+  
+  THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS "AS IS" AND
+  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  SUCH DAMAGE.
+  
+  This file is part of the LWM2M DevKit.
+-->
+
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+
+<dialog id="lwm2m-devkit-launcher-window" buttons="accept,cancel" title="OMA LWM2M DevKit Launcher"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	style="padding: 0px;"
+	ondialogaccept="return Lwm2mDevKit.open(document.getElementById('lwm2m-devkit-target').value);">
+
+<script type="application/x-javascript" src="chrome://lwm2m-devkit/content/namespace.js"/> 
+<script type="application/x-javascript" src="chrome://lwm2m-devkit/content/script/Launcher.js"/>
+<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/Logger.js"/>
+
+	<vbox style="background-color: rgb(72,72,72); color: white;">
+		<box pack="center" style="overflow: hidden; background-color: white; min-height: 60px;" height="60">
+			<image src="chrome://lwm2m-devkit/skin/oma-logo.png" style="width: 20em;" />
+		</box>
+		<box pack="center" style="overflow: hidden;">
+			<image src="chrome://lwm2m-devkit/skin/lwm2m-devkit-logo.png" style="width: 20em;" />
+		</box>
+
+		<vbox flex="1" style="margin: 10px;">
+			<description id="lwm2m-devkit-info">
+				Enter the URI of the LWM2M Server:
+			</description>
+			<textbox id="lwm2m-devkit-target" value="coap://" style="padding: 5px;" />
+			<description style="white-space: pre-wrap">
+Direct access:
+Enter the LWM2M Server address into the browser addressbar
+using the 'coap+lwm2m' URI scheme (coap+lwm2m://host:port/).
+The 'coap' scheme is used for the <label class="text-link" href="https://addons.mozilla.org/" value="Copper (Cu) CoAP user-agent" style="color: rgb(66, 184, 221);"/>.
+			</description>
+		</vbox>
+	</vbox>
+</dialog>

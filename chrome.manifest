@@ -1,0 +1,15 @@
+component {3ce3a624-507a-11e4-98b7-fd8b1d5d46b0} components/Lwm2mDevKitProtocolHandler.js
+contract @mozilla.org/network/protocol;1?name=coap+lwm2m	{3ce3a624-507a-11e4-98b7-fd8b1d5d46b0}
+category profile-after-change Lwm2mDevKitProtocolHandler @mozilla.org/network/protocol;1?name=coap+lwm2m
+
+content	lwm2m-devkit    chrome/content/ contentaccessible=yes
+
+overlay	chrome://browser/content/browser.xul	chrome/content/overlay.xul
+overlay	chrome://navigator/content/navigator.xul	chrome/content/overlay.xul
+
+locale lwm2m-devkit en-US chrome/locale/en-US/
+
+skin lwm2m-devkit classic chrome/skin/
+
+resource clients clients/
+resource objects objects/
