@@ -5,6 +5,8 @@ OMA LWM2M DevKit
 The OMA LWM2M DevKit is an add-on for the [Mozilla Firefox](https://www.mozilla.org/firefox/) Web browser. It adds support for the [OMA Lightweight M2M protocol](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) and enables manual interaction with a LWM2M Server directly from the Web browser.
 This way, developers and users can interactively explore and comprehend the new protocol for machine-to-machine communication.
 
+![GUI](https://raw.githubusercontent.com/OpenMobileAlliance/OMA-LWM2M-DevKit/master/docs/gui-client.png)
+
 ## Features
 -  OMA Lightweight M2M 1.0
 -  Virtual LWM2M Clients
