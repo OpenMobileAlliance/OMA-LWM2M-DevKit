@@ -128,16 +128,20 @@ Lwm2mDevKit.DeviceManagement.handleRead = function(message) {
 			return;
 		}
 		
-		if (message.getContentFormat()==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV
+		if (message.getAccept()==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV
 				|| Lwm2mDevKit.isObject( Lwm2mDevKit.client.instances[obj][ins][res] )) {
 			
 			pl = Lwm2mDevKit.TLV.encode( Lwm2mDevKit.client.instances[obj][ins][res], obj, ins, res );
 			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV;
-		} else if (message.getContentFormat()==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON) {
+			
+		} else if (message.getAccept()==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON) {
 			message.respond(Lwm2mDevKit.Copper.CODE_5_01_NOT_IMPLEMENTED, "JSON not supported yet");
 			Lwm2mDevKit.logOperation("Read", message.getUriPath(), "Not Implemented", message);
 			return;
-		} else {
+			
+		} else if (message.getAccept()==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TEXT
+				|| message.getAccept()==Lwm2mDevKit.Copper.CONTENT_TYPE_TEXT_PLAIN
+				|| message.getAccept()==null) {
 			pl = Lwm2mDevKit.client.instances[obj][ins][res];
 			if (typeof pl === 'number') {
 				pl = pl.toString();
@@ -145,7 +149,12 @@ Lwm2mDevKit.DeviceManagement.handleRead = function(message) {
 				if (pl) pl = new String(1);
 				else    pl = new String(0);
 			}
-			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_TEXT_PLAIN;
+			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TEXT;
+			
+		} else {
+			message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Not Acceptable");
+			Lwm2mDevKit.logOperation("Read", message.getUriPath(), "Not Acceptable", message);
+			return;
 		}
 		
 	}
