@@ -35,9 +35,6 @@
 <prefwindow id="lwm2m-devkit-options-window"
      title="OMA LWM2M DevKit Preferences"
      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-
-<script type="application/x-javascript" src="chrome://copper/content/copper/namespace.js"/>     
-<script type="application/x-javascript" src="chrome://copper/content/Options.js"/>
      
 	<prefpane label="OMA LWM2M DevKit Preferences">
 		<preferences>

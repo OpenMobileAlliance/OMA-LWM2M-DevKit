@@ -37,8 +37,8 @@
 <overlay id="lwm2m-devkit-overlay"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	
-	<script type="application/x-javascript" src="chrome://lwm2m-devkit/content/namespace.js"/> 
-	<script type="application/x-javascript" src="chrome://lwm2m-devkit/content/script/Launcher.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/namespace.js"/> 
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/Launcher.js"/>
 
 	<!-- Old tools menu -->
 	<menupopup id="menu_ToolsPopup">

@@ -37,9 +37,9 @@
 	style="padding: 0px;"
 	ondialogaccept="return Lwm2mDevKit.open(document.getElementById('lwm2m-devkit-target').value);">
 
-<script type="application/x-javascript" src="chrome://lwm2m-devkit/content/namespace.js"/> 
-<script type="application/x-javascript" src="chrome://lwm2m-devkit/content/script/Launcher.js"/>
-<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/Logger.js"/>
+<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/namespace.js"/> 
+<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/Launcher.js"/>
+<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/Logger.js"/>
 
 	<vbox style="background-color: rgb(72,72,72); color: white;">
 		<box pack="center" style="overflow: hidden; background-color: white; min-height: 60px;" height="60">

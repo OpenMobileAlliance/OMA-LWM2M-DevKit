@@ -49,16 +49,16 @@
 	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/copper/CoapRFC7252.js"/>
 	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/copper/CoapMessage.js"/>
 	
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/Helpers.js"/>
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/DeviceHandler.js" />
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/CoapHandlers.js"/>
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/Logger.js"/>
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/Tooltips.js"/>
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/EncodingTLV.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/Helpers.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/DeviceHandler.js" />
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/CoapHandlers.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/Logger.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/Tooltips.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/EncodingTLV.js"/>
 	
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/InterfaceRegistration.js"/>
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/InterfaceDeviceManagement.js"/>
-	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/script/InterfaceInformationReporting.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/InterfaceRegistration.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/InterfaceDeviceManagement.js"/>
+	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/lwm2m/InterfaceInformationReporting.js"/>
 	
 	<script type="application/x-javascript" charset="utf-8" src="chrome://lwm2m-devkit/content/main.js" />
 	
