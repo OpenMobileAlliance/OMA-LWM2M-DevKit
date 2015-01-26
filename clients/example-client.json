@@ -65,7 +65,8 @@
 				"3": 60,
 				"5": 3600,
 				"6": true,
-				"7": "U"
+				"7": "U",
+				"8": "Lwm2mDevKit.Registration.update();"
 			}
 		},
 

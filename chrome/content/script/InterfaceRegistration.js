@@ -104,6 +104,8 @@ Lwm2mDevKit.Registration.onRegister = function(message) {
 Lwm2mDevKit.Registration.update = function() {
 	
 	try {
+		Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Registration Update on '+ Lwm2mDevKit.registrationHandle);
+		
 		let uri = Lwm2mDevKit.registrationHandle;//loc value got from the handle
 		let lt = Lwm2mDevKit.field('lifetime');
 		let b = Lwm2mDevKit.field('binding');
