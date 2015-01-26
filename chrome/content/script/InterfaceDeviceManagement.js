@@ -278,6 +278,9 @@ Lwm2mDevKit.DeviceManagement.handleWrite = function(message) {
 	
 	message.respond(Lwm2mDevKit.Copper.CODE_2_04_CHANGED);
 	Lwm2mDevKit.logOperation("Write", message.getUriPath(), "Success", message);
+	
+	// show the Instance
+	Lwm2mDevKit.showInstanceScreen(obj, ins);
 };
 
 
