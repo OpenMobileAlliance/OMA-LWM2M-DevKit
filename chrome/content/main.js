@@ -111,7 +111,6 @@ Lwm2mDevKit.main = function() {
 		element = document.getElementById("tooltip");
 		element.addEventListener('click', Lwm2mDevKit.Tooltips.clickThrough, true);
 		
-
 		var element = document.getElementById("panel_event_log");
 		element.addEventListener('popupshowing', function() { this.sizeTo(document.getElementById('main_content').clientWidth-20, document.getElementById('main_content').clientHeight-80); }, true);
 		
@@ -137,37 +136,21 @@ Lwm2mDevKit.unload = function() {
 	Lwm2mDevKit.saveBehavior();
 };
 
-Lwm2mDevKit.field = function(id) {
-	try {
-		return document.getElementById(id).value;
-	} catch (ex) {
-		Lwm2mDevKit.logError(new Error('Field ' + id + ' not found'));
-	}
-};
-Lwm2mDevKit.update = function(id, value) {
-	document.getElementById(id).value = value;
-};
-
 //Sends a CoAP ping which is an empty CON message
 Lwm2mDevKit.ping = function() {
 	try {
 		Lwm2mDevKit.coapEndpoint.cancelTransactions();
 		var message = new Lwm2mDevKit.CoapMessage(Lwm2mDevKit.Copper.MSG_TYPE_CON);
-		Lwm2mDevKit.coapEndpoint.send( message );
+		Lwm2mDevKit.coapEndpoint.send( message, Lwm2mDevKit.pingHandler );
 	} catch (ex) {
 		Lwm2mDevKit.logError(ex);
 	}
-	
-	window.setTimeout(
-			function() { Lwm2mDevKit.pingInfo(); },
-			500);
-};
 
-Lwm2mDevKit.pingInfo = function() {
+	// local socket address available after first send()
 	if (Lwm2mDevKit.coapEndpoint.client.getAddr()!=null) {
 		Lwm2mDevKit.localAddr = Lwm2mDevKit.coapEndpoint.client.getAddr().address;
 		if (Lwm2mDevKit.localAddr.indexOf(":")!=-1) Lwm2mDevKit.localAddr = '[' + Lwm2mDevKit.localAddr + ']';
 		Lwm2mDevKit.localPort = Lwm2mDevKit.coapEndpoint.client.getAddr().port;
-		Lwm2mDevKit.update('local_address', Lwm2mDevKit.localAddr + ':' + Lwm2mDevKit.localPort);
+		Lwm2mDevKit.set('local_address', Lwm2mDevKit.localAddr + ':' + Lwm2mDevKit.localPort);
 	}
 };

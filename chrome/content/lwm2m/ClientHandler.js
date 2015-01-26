@@ -87,7 +87,11 @@ Lwm2mDevKit.loadDefaultLWM2MDevice = function() {
 };
 
 Lwm2mDevKit.activateButtons = function() {
-	document.getElementById('button_registration').disabled = false;
+	if (Lwm2mDevKit.client) {
+		document.getElementById('button_registration').disabled = false;
+	} else {
+		document.getElementById('button_registration').disabled = true;
+	}
 	if (Lwm2mDevKit.registrationHandle!=null) {
 		document.getElementById('button_service').disabled = false;
 	} else {
@@ -102,9 +106,9 @@ Lwm2mDevKit.activateButtons = function() {
 };
 
 Lwm2mDevKit.setClientProperties = function() {
-	Lwm2mDevKit.update('endpoint_name', Lwm2mDevKit.client.endpointClientName);
-	Lwm2mDevKit.update('lifetime', Lwm2mDevKit.client.lifetime);
-	Lwm2mDevKit.update('version', Lwm2mDevKit.client.version);
+	Lwm2mDevKit.set('endpoint_name', Lwm2mDevKit.client.endpointClientName);
+	Lwm2mDevKit.set('lifetime', Lwm2mDevKit.client.lifetime);
+	Lwm2mDevKit.set('version', Lwm2mDevKit.client.version);
 	
 	// set object instance data
 	Lwm2mDevKit.client.instances[0][1][0] = 'coap://' + Lwm2mDevKit.hostname + ':' + Lwm2mDevKit.port;
@@ -647,14 +651,14 @@ Lwm2mDevKit.changeResource = function(field, obj, ins, res, id) {
 			if (obj==1 && ins==1 && res==1) {
 				Lwm2mDevKit.logEvent('Lifetime change');
 				Lwm2mDevKit.client.lifetime = parseInt(value);
-				Lwm2mDevKit.update('lifetime', Lwm2mDevKit.client.lifetime);
+				Lwm2mDevKit.set('lifetime', Lwm2mDevKit.client.lifetime);
 			} else if ((obj==1 && ins==1 && res==7) || (obj==3 && ins==0 && res==16)) {
 				Lwm2mDevKit.logEvent('Binding change blocked');
 				blocked = true;
 			} else if (obj==3 && ins==0 && res==3) {
 				Lwm2mDevKit.logEvent('Version change');
 				Lwm2mDevKit.client.version = value;
-				Lwm2mDevKit.update('version', Lwm2mDevKit.client.version);
+				Lwm2mDevKit.set('version', Lwm2mDevKit.client.version);
 			}
 			
 			if (blocked) {

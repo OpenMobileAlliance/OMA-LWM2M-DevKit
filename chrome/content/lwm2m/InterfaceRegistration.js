@@ -41,11 +41,11 @@ Lwm2mDevKit.Registration.register = function() {
 	// TODO: discover and find rt="core.rd" first
 	
 	try {
-		let ep = Lwm2mDevKit.field('endpoint_name');
-		let lt = Lwm2mDevKit.field('lifetime');
-		let lwm2m = Lwm2mDevKit.field('version');
-		let b = Lwm2mDevKit.field('binding');
-		let sms = Lwm2mDevKit.field('sms_no');
+		let ep = Lwm2mDevKit.get('endpoint_name');
+		let lt = Lwm2mDevKit.get('lifetime');
+		let lwm2m = Lwm2mDevKit.get('version');
+		let b = Lwm2mDevKit.get('binding');
+		let sms = Lwm2mDevKit.get('sms_no');
 		
 		if (!ep) throw new Error('You must specify an Endpoint Client Name.');
 		
@@ -95,8 +95,8 @@ Lwm2mDevKit.Registration.onRegister = function(message) {
 		document.getElementById('update').disabled = true;
 		document.getElementById('deregister').disabled = true;
 	}
-	Lwm2mDevKit.update('handle', Lwm2mDevKit.registrationHandle);
-	Lwm2mDevKit.update('last_update', Lwm2mDevKit.registrationTimestamp);
+	Lwm2mDevKit.set('handle', Lwm2mDevKit.registrationHandle);
+	Lwm2mDevKit.set('last_update', Lwm2mDevKit.registrationTimestamp);
 	
 	Lwm2mDevKit.activateButtons();
 };
@@ -107,9 +107,9 @@ Lwm2mDevKit.Registration.update = function() {
 		Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Registration Update on '+ Lwm2mDevKit.registrationHandle);
 		
 		let uri = Lwm2mDevKit.registrationHandle;//loc value got from the handle
-		let lt = Lwm2mDevKit.field('lifetime');
-		let b = Lwm2mDevKit.field('binding');
-		let sms = Lwm2mDevKit.field('sms_no');
+		let lt = Lwm2mDevKit.get('lifetime');
+		let b = Lwm2mDevKit.get('binding');
+		let sms = Lwm2mDevKit.get('sms_no');
 		
 		if (!uri) throw new Error('No registration handle');
 		
@@ -143,7 +143,7 @@ Lwm2mDevKit.Registration.onUpdate = function(message) {
 			Lwm2mDevKit.logWarning(new Error('Server responded with '+ message.getCode(true) + (message.getPayload().length>0 ? '\nDiagnostic message: ' + message.getPayloadText() : "")));
 		}
 	}
-	Lwm2mDevKit.update('last_update', Lwm2mDevKit.registrationTimestamp);
+	Lwm2mDevKit.set('last_update', Lwm2mDevKit.registrationTimestamp);
 	
 	Lwm2mDevKit.activateButtons();
 };
@@ -181,8 +181,8 @@ Lwm2mDevKit.Registration.onDeregister = function(message) {
 		window.clearInterval(Lwm2mDevKit.Registration.scheduleInterval);
 	}
 	
-	Lwm2mDevKit.update('handle', Lwm2mDevKit.registrationHandle);
-	Lwm2mDevKit.update('last_update', Lwm2mDevKit.registrationTimestamp);
+	Lwm2mDevKit.set('handle', Lwm2mDevKit.registrationHandle);
+	Lwm2mDevKit.set('last_update', Lwm2mDevKit.registrationTimestamp);
 	
 	Lwm2mDevKit.activateButtons();
 };
@@ -198,9 +198,9 @@ Lwm2mDevKit.Registration.scheduleUpdate = function() {
 	}
 	
 	// steal a second to compensate RTT
-	Lwm2mDevKit.Registration.scheduleTimeout = parseInt(Lwm2mDevKit.field('lifetime')) - 1;
+	Lwm2mDevKit.Registration.scheduleTimeout = parseInt(Lwm2mDevKit.get('lifetime')) - 1;
 	
-	Lwm2mDevKit.update('scheduled_update', Lwm2mDevKit.Registration.scheduleTimeout + ' seconds');
+	Lwm2mDevKit.set('scheduled_update', Lwm2mDevKit.Registration.scheduleTimeout + ' seconds');
 	
 	Lwm2mDevKit.Registration.scheduleTimer = window.setTimeout( function() { Lwm2mDevKit.Registration.update(); }, Lwm2mDevKit.Registration.scheduleTimeout*1000 - 50);
 	Lwm2mDevKit.Registration.scheduleInterval = window.setInterval( function() { Lwm2mDevKit.Registration.tickUpdate() }, 1000);
@@ -221,10 +221,10 @@ Lwm2mDevKit.Registration.tickUpdate = function() {
 	    if (minutes < 10) minutes = '0' + minutes;
 	    if (seconds < 10) seconds = '0' + seconds;
 		
-		Lwm2mDevKit.update('scheduled_update', hours + ':' + minutes + ':' + seconds);
+		Lwm2mDevKit.set('scheduled_update', hours + ':' + minutes + ':' + seconds);
 		
 	} else {
-		Lwm2mDevKit.update('scheduled_update', '');
+		Lwm2mDevKit.set('scheduled_update', '');
 		window.clearInterval(Lwm2mDevKit.Registration.scheduleInterval);
 	}
 };

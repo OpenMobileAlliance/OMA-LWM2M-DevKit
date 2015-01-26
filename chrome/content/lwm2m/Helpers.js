@@ -234,6 +234,18 @@ Lwm2mDevKit.myBind = function(scope, fn) {
 	};
 };
 
+Lwm2mDevKit.get = function(id) {
+	try {
+		return document.getElementById(id).value;
+	} catch (ex) {
+		Lwm2mDevKit.logError(new Error('Field ' + id + ' not found'));
+	}
+};
+
+Lwm2mDevKit.set = function(id, value) {
+	document.getElementById(id).value = value;
+};
+
 Lwm2mDevKit.popupService = Components.classes['@mozilla.org/alerts-service;1'].getService(Components.interfaces.nsIAlertsService);
 // Too frequent popups are suppressed, hence this queueing mode
 Lwm2mDevKit.popupInterval = 1000;

@@ -46,9 +46,6 @@ Lwm2mDevKit.defaultHandler = function(message) {
 //Handle ping responses
 Lwm2mDevKit.pingHandler = function(message) {
 	
-//	Lwm2mDevKit.debug(document.getElementById('ping_info'));
-//	Lwm2mDevKit.debug(document.getElementById('ping_info').firstChild);
-	
 	document.getElementById('ping_info').style.color = '#006600';
 	document.getElementById('ping_info').textContent = 'The remote address \n responds to CoAP ping: CON-EMPTY/RST-EMPTY';
 	

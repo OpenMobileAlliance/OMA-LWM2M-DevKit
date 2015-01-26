@@ -166,7 +166,7 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 			this.registeredTIDs[message.getTID()] = this.requests[message.getToken()];
 		// store ping
 		} else if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON && message.getCode()==0) {
-			this.registeredTIDs[message.getTID()] = Lwm2mDevKit.pingHandler;
+			this.registeredTIDs[message.getTID()] = reqCB;
 		}
 
 		Lwm2mDevKit.logMessage(message, true);
