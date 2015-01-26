@@ -311,7 +311,10 @@ Lwm2mDevKit.logWarning = function(text) {
 };
 
 Lwm2mDevKit.logError = function(text, skip) {
-	if (Lwm2mDevKit.coapEndpoint) Lwm2mDevKit.coapEndpoint.cancelTransactions();
+	if (Lwm2mDevKit.coapEndpoint) {
+		Lwm2mDevKit.InformationReporting.cancelAll();
+		Lwm2mDevKit.coapEndpoint.cancelTransactions();
+	}
 	window.setTimeout(
 			function() { alert('ERROR: '+ text + (skip ? '' : '\n\nStacktrace:\n' + text.stack)); },
 			0);

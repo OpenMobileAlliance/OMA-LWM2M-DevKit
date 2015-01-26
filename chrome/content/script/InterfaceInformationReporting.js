@@ -145,6 +145,10 @@ Lwm2mDevKit.InformationReporting.cancelAll = function() {
 	for (let token in Lwm2mDevKit.InformationReporting.relations) {
 		let entry = Lwm2mDevKit.InformationReporting.relations[token];
 		if (entry.timer) window.clearTimeout(entry.timer);
+
+		let rows = document.getElementById('reporting_relations');
+		rows.removeChild( document.getElementById('reporting_relation_'+cancel) );
+		
 		delete Lwm2mDevKit.InformationReporting.relations[token];
 	}
 };

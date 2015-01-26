@@ -90,10 +90,11 @@ Lwm2mDevKit.UdpClient.prototype = {
 	},
 	
 	onStopRequest : function(request, context, status) {
-		this.outputStream.close();
-		this.inputStream.close();
 		if (!this.ended) {
+			this.shutdown();
 			Lwm2mDevKit.logError(new Error('Host/network unreachable'), true);
+		} else {
+			Lwm2mDevKit.logWarning('Illegal state');
 		}
 	},
 	
@@ -134,6 +135,8 @@ Lwm2mDevKit.UdpClient.prototype = {
 	},
 	
 	send : function(datagram) {
+		
+		if (this.ended) return;
 		
 		// the transport API also concatenates outgoing datagrams when sent too quickly
 		let since = new Date() - this.lastSend;
