@@ -52,8 +52,12 @@ Lwm2mDevKit.loadDefaultLWM2MDevice = function() {
 		}
 
 		let data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-
-		Lwm2mDevKit.objectDefinitions = JSON.parse(data);
+		try {
+			Lwm2mDevKit.objectDefinitions = JSON.parse(data);
+		} catch (ex) {
+			ex.message = "Cannot load Objects from " + objectDefinitionsFile + ":\n\n" + ex.message;
+			Lwm2mDevKit.logError(ex, true);
+		}
 	});
 
 	NetUtil.asyncFetch(clientFile, function(inputStream, status) {
@@ -65,13 +69,18 @@ Lwm2mDevKit.loadDefaultLWM2MDevice = function() {
 
 		let data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
 
-		Lwm2mDevKit.client = JSON.parse(data);
-		
-		Lwm2mDevKit.setClientProperties();
-		Lwm2mDevKit.clearTree();
-		Lwm2mDevKit.setTree();
-
-		Lwm2mDevKit.activateButtons();
+		try {
+			Lwm2mDevKit.client = JSON.parse(data);
+			
+			Lwm2mDevKit.setClientProperties();
+			Lwm2mDevKit.clearTree();
+			Lwm2mDevKit.setTree();
+	
+			Lwm2mDevKit.activateButtons();
+		} catch (ex) {
+			ex.message = "Cannot load Client from " + clientFile + ":\n\n" + ex.message;
+			Lwm2mDevKit.logError(ex, true);
+		}
 	});
 };
 
