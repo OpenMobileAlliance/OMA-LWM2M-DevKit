@@ -51,7 +51,7 @@ Lwm2mDevKit.loadDefaultLWM2MDevice = function() {
 			return;
 		}
 
-		let data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+		let data = Lwm2mDevKit.utf8Entities( NetUtil.readInputStreamToString(inputStream, inputStream.available(), {"charset": "UTF-8"}) );
 		try {
 			Lwm2mDevKit.objectDefinitions = JSON.parse(data);
 		} catch (ex) {
@@ -67,10 +67,12 @@ Lwm2mDevKit.loadDefaultLWM2MDevice = function() {
 			return;
 		}
 
-		let data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+		let data = Lwm2mDevKit.utf8Entities( NetUtil.readInputStreamToString(inputStream, inputStream.available(), {"charset": "UTF-8"}) );
 
 		try {
 			Lwm2mDevKit.client = JSON.parse(data);
+			
+			// in try block to discontinue if parsing fails
 			
 			Lwm2mDevKit.setClientProperties();
 			Lwm2mDevKit.clearTree();
@@ -245,7 +247,7 @@ Lwm2mDevKit.showObjectDefinition = function(obj) {
 	document.getElementById("object_id").setAttribute('label', obj);
 	document.getElementById("object_name").setAttribute('label', definition.name);
 	document.getElementById("object_mandatory").setAttribute('label', definition.mandatory);
-	document.getElementById("object_instances").setAttribute('label', definition.instances);
+	document.getElementById("object_instances").setAttribute('label', definition.instancetype);
 	document.getElementById("object_desc").setAttribute('label', definition.description);
 	document.getElementById("object_desc").setAttribute('tooltiptext', definition.description);
 	
@@ -284,7 +286,7 @@ Lwm2mDevKit.showObjectDefinition = function(obj) {
 
 Lwm2mDevKit.showResourceDefinitions = function(obj) {
 
-	let resources = Lwm2mDevKit.objectDefinitions[obj].resources;
+	let resourcedefs = Lwm2mDevKit.objectDefinitions[obj].resourcedefs;
 	let rows = document.getElementById('resource_definitions');
 
 	// clear
@@ -293,9 +295,9 @@ Lwm2mDevKit.showResourceDefinitions = function(obj) {
 		rows.removeChild(elems[1]);
 	}
 
-	rows.setAttribute('rows', resources.length);
+	rows.setAttribute('rows', resourcedefs.length);
 
-	for (let i in resources) {
+	for (let i in resourcedefs) {
 
 		var row = document.createElement('row');
 		row.style.borderBottom = '1px solid silver';
@@ -306,41 +308,41 @@ Lwm2mDevKit.showResourceDefinitions = function(obj) {
 		row.appendChild(cell);
 		
 		cell = document.createElement('listcell');
-		cell.setAttribute('label', resources[i].name);
+		cell.setAttribute('label', resourcedefs[i].name);
 		row.appendChild(cell);
 		
 		cell = document.createElement('listcell');
-		cell.setAttribute('label', resources[i].instances);
+		cell.setAttribute('label', resourcedefs[i].instancetype);
 		cell.style.textAlign = 'center';
 		row.appendChild(cell);
 		
 		cell = document.createElement('listcell');
-		cell.setAttribute('label', resources[i].mandatory);
+		cell.setAttribute('label', resourcedefs[i].mandatory);
 		cell.style.textAlign = 'center';
 		row.appendChild(cell);
 		
 		cell = document.createElement('listcell');
-		cell.setAttribute('label', resources[i].operations);
+		cell.setAttribute('label', resourcedefs[i].operations);
 		cell.style.textAlign = 'center';
 		row.appendChild(cell);
 		
 		cell = document.createElement('listcell');
-		cell.setAttribute('label', resources[i].type);
+		cell.setAttribute('label', resourcedefs[i].type);
 		row.appendChild(cell);
 		
 		cell = document.createElement('listcell');
-		cell.setAttribute('label', resources[i].range);
+		cell.setAttribute('label', resourcedefs[i].range);
 		row.appendChild(cell);
 		
 		cell = document.createElement('listcell');
-		cell.setAttribute('label', resources[i].units);
+		cell.setAttribute('label', resourcedefs[i].units);
 		row.appendChild(cell);
 		
 		cell = document.createElement('listcell');
 		let box = document.createElement('description');
 		box.setAttribute('flex', '1');
 		box.setAttribute('style', 'padding: 8px 0 9px 0; white-space: pre-wrap;');
-		box.textContent = Lwm2mDevKit.htmlEntities(resources[i].description);
+		box.textContent = Lwm2mDevKit.htmlEntities(resourcedefs[i].description);
 		cell.appendChild(box);
 		row.appendChild(cell);
 
@@ -401,7 +403,7 @@ Lwm2mDevKit.showObjectInstance = function(obj, ins) {
 
 Lwm2mDevKit.showResourceValues = function(obj, ins) {
 
-	let definitions = Lwm2mDevKit.objectDefinitions[obj].resources;
+	let resourcedefs = Lwm2mDevKit.objectDefinitions[obj].resourcedefs;
 	let resources = Lwm2mDevKit.client.instances[obj][ins];
 	let rows = document.getElementById('resource_values');
 
@@ -415,7 +417,7 @@ Lwm2mDevKit.showResourceValues = function(obj, ins) {
 	
 	let row;
 	
-	for (let res in definitions) {
+	for (let res in resourcedefs) {
 		
 		if (resources[res]!==undefined) {
 			
@@ -442,7 +444,7 @@ Lwm2mDevKit.showResourceValues = function(obj, ins) {
 					
 					rows.appendChild(
 							Lwm2mDevKit.addResourceRow(
-									flag ? '' : definitions[res].name,
+									flag ? '' : resourcedefs[res].name,
 									value[id],
 									attribs,
 									obj,
@@ -457,7 +459,7 @@ Lwm2mDevKit.showResourceValues = function(obj, ins) {
 				
 			} else {
 				row = Lwm2mDevKit.addResourceRow(
-								definitions[res].name,
+								resourcedefs[res].name,
 								value,
 								attribs,
 								obj,
@@ -493,7 +495,7 @@ Lwm2mDevKit.addResourceRow = function(name, value, attributes, obj, ins, res, id
 	row.appendChild(cell);
 
 	cell = document.createElement('listcell');
-	let type = Lwm2mDevKit.objectDefinitions[obj].resources[res].type;
+	let type = Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].type;
 	
 	var input = document.createElement('textbox');
 	input.setAttribute('flex', '1');
@@ -511,7 +513,7 @@ Lwm2mDevKit.addResourceRow = function(name, value, attributes, obj, ins, res, id
 
 	cell = document.createElement('listcell');
 	
-	if ( Lwm2mDevKit.objectDefinitions[obj].resources[res].operations.indexOf('R')!=-1) {
+	if ( Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].operations.indexOf('R')!=-1) {
 		cell.pack = "center";
 		var button = document.createElement('button');
 		button.setAttribute('class', 'special-button');
@@ -526,9 +528,9 @@ Lwm2mDevKit.addResourceRow = function(name, value, attributes, obj, ins, res, id
 
 Lwm2mDevKit.addNewResourceRow = function(obj, instanceID , resID, instanceOnly) {
 
-	let definitions = Lwm2mDevKit.objectDefinitions[obj].resources[resID];
+	let resourcedef = Lwm2mDevKit.objectDefinitions[obj].resourcedefs[resID];
 	let resources = Lwm2mDevKit.client.instances[obj][instanceID];
-	let multi = definitions.instances=='multiple';
+	let multi = resourcedef.instancetype=='multiple';
 	
 	let row = document.createElement('row');
 	
@@ -544,7 +546,7 @@ Lwm2mDevKit.addNewResourceRow = function(obj, instanceID , resID, instanceOnly) 
 	
 		cell = document.createElement('listcell');
 		if (!instanceOnly) {
-			cell.setAttribute('label', definitions.name);
+			cell.setAttribute('label', resourcedef.name);
 		}
 		row.appendChild(cell);
 		
@@ -597,27 +599,27 @@ Lwm2mDevKit.changeResource = function(field, obj, ins, res, id) {
 		let value = field.value;
 		let old = null;
 		let blocked = false;
-		let type = Lwm2mDevKit.objectDefinitions[obj].resources[res].type;
+		let type = Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].type.toLowerCase();
 		
 		switch (type) {
-		case "String":
+		case "string":
 			// done
 			break;
-		case "Integer":
-		case "Float":
+		case "integer":
+		case "float":
 			value = Number(value);
 			break;
-		case "Boolean":
+		case "boolean":
 			value = Boolean(value);
 			break;
-		case "Opaque":
+		case "opaque":
 			// TODO
 			break;
-		case "Time":
+		case "time":
 			value = parseInt(new Date(value).getTime() / 1000);
 			break;
 		default:
-			if (Lwm2mDevKit.objectDefinitions[obj].resources[res].operations.indexOf('E')!=-1) {
+			if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].operations.indexOf('E')!=-1) {
 				// users should be able to define an action for executable Resources
 				// they can only be defined by the user through the GUI
 				try {
@@ -732,7 +734,7 @@ Lwm2mDevKit.createInstance = function(obj, ins, data) {
 	if (Lwm2mDevKit.client.objects.indexOf(obj)==-1) {
 		Lwm2mDevKit.logError(new Error("Object not supported by client"));
 		return false;
-	} else if (Lwm2mDevKit.objectDefinitions[obj].instances=='single' && Lwm2mDevKit.client.instances[obj]!==undefined && Lwm2mDevKit.client.instances[obj].length>0) {
+	} else if (Lwm2mDevKit.objectDefinitions[obj].instancetype=='single' && Lwm2mDevKit.client.instances[obj]!==undefined && Lwm2mDevKit.client.instances[obj].length>0) {
 		Lwm2mDevKit.logWarning(new Error("Cannot create more than one single Object Instance"));
 		return false;
 	}
@@ -762,7 +764,7 @@ Lwm2mDevKit.createInstance = function(obj, ins, data) {
 
 Lwm2mDevKit.deleteInstance = function(obj, ins) {
 	
-	if (Lwm2mDevKit.objectDefinitions[obj].instances=='single' && Lwm2mDevKit.objectDefinitions[obj].mandatory=='yes') {
+	if (Lwm2mDevKit.objectDefinitions[obj].instancetype=='single' && Lwm2mDevKit.objectDefinitions[obj].mandatory) {
 		Lwm2mDevKit.logWarning(new Error("Cannot delete single mandatory Object Instance"));
 		return false;
 	}

@@ -298,6 +298,12 @@ Lwm2mDevKit.htmlEntities = function(raw) {
 		});
 };
 
+Lwm2mDevKit.utf8Entities = function(encoded) {
+	return encoded.replace(/(\&#([0-9]+);)/gim, function(k, l, m) {
+			return String.fromCharCode(m);
+		});
+};
+
 Lwm2mDevKit.getObjectAddress = function(message) {
 	let path = message.getUriPath();
 	let root = Lwm2mDevKit.client.root;

@@ -62,7 +62,7 @@ Lwm2mDevKit.DeviceManagement.operationHandler = function(message) {
 		if (ins===undefined || Lwm2mDevKit.client.instances[obj][ins]===undefined) {
 			// no Object Instance
 			Lwm2mDevKit.DeviceManagement.handleCreate(message);
-		} else if (res!==undefined && Lwm2mDevKit.objectDefinitions[obj].resources[res].operations.indexOf('E')!=-1) {
+		} else if (res!==undefined && Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].operations.indexOf('E')!=-1) {
 			// executable Resource
 			Lwm2mDevKit.DeviceManagement.handleExecute(message);
 		} else {
@@ -256,7 +256,7 @@ Lwm2mDevKit.DeviceManagement.handleWrite = function(message) {
 		
 		} else if (cf==Lwm2mDevKit.Copper.CONTENT_TYPE_TEXT_PLAIN || cf==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TEXT) {
 			// does not work for Resource Instances
-			if (Lwm2mDevKit.objectDefinitions[obj].resources[res].instances=="multiple") {
+			if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].instancetype=="multiple") {
 				message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Use TLV to write Multi-Resource");
 				Lwm2mDevKit.logOperation("Write", message.getUriPath(), "Bad Request", message);
 				return;
@@ -449,7 +449,7 @@ Lwm2mDevKit.DeviceManagement.partialUpdate = function(data, obj, ins, res) {
 		}
 		
 		for (let i in data) {
-			if (Lwm2mDevKit.objectDefinitions[obj].resources[i].operations.indexOf('W')==-1) {
+			if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[i].operations.indexOf('W')==-1) {
 				Lwm2mDevKit.logWarning("Write operation not allowed for Resource /"+obj+"/"+ins+"/"+i);
 				continue;
 			}
@@ -458,12 +458,12 @@ Lwm2mDevKit.DeviceManagement.partialUpdate = function(data, obj, ins, res) {
 		
 	} else {
 		// check if Write operation is allowed
-		if (Lwm2mDevKit.objectDefinitions[obj].resources[res].operations.indexOf('W')==-1) {
+		if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].operations.indexOf('W')==-1) {
 			Lwm2mDevKit.logWarning("Write operation not allowed for Resource /"+obj+"/"+ins+"/"+res);
 			return;
 		}
 		
-		if (Lwm2mDevKit.objectDefinitions[obj].resources[res].instances=="multiple") {
+		if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].instancetype=="multiple") {
 			if (!Lwm2mDevKit.isObject(data)) {
 				Lwm2mDevKit.logError("Cannot write scalar to multiple Resource");
 				return;
@@ -489,20 +489,20 @@ Lwm2mDevKit.DeviceManagement.replace = function(data, obj, ins, res) {
 			return;
 		}
 		
-		for (let i in Lwm2mDevKit.objectDefinitions[obj].resources) {
-			if (Lwm2mDevKit.objectDefinitions[obj].resources[i].operations.indexOf('W')==-1) continue;
+		for (let i in Lwm2mDevKit.objectDefinitions[obj].resourcedefs) {
+			if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[i].operations.indexOf('W')==-1) continue;
 			
 			Lwm2mDevKit.client.instances[obj][ins][i] = data[i];
 		}
 		
 	} else {
 		// check if Write operation is allowed
-		if (Lwm2mDevKit.objectDefinitions[obj].resources[res].operations.indexOf('W')==-1) {
+		if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].operations.indexOf('W')==-1) {
 			Lwm2mDevKit.logWarning("Write operation not allowed for Resource /"+obj+"/"+ins+"/"+res);
 			return;
 		}
 		
-		if (Lwm2mDevKit.objectDefinitions[obj].resources[res].instances=="multiple") {
+		if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].instancetype=="multiple") {
 			if (!Lwm2mDevKit.isObject(data)) {
 				Lwm2mDevKit.logError("Cannot write scalar to multiple Resource");
 				return;

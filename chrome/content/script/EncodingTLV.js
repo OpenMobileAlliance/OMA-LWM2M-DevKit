@@ -145,7 +145,7 @@ Lwm2mDevKit.TLV.encodeObjectInstance = function(resources, obj, ins) {
 
 Lwm2mDevKit.TLV.encodeResource = function(resource, obj, ins, res) {
 	
-	if (Lwm2mDevKit.objectDefinitions[obj].resources[res].operations.indexOf('R')==-1) {
+	if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].operations.indexOf('R')==-1) {
 		Lwm2mDevKit.logEvent("TLV-ENC:       Skipping unreadable Resource /"+obj+"/"+ins+"/"+res);
 		return new Array(0);
 	}
@@ -181,22 +181,22 @@ Lwm2mDevKit.TLV.encodeValue = function(value, obj, ins, res) {
 	
 	let bytes = null;
 	
-	let type = Lwm2mDevKit.objectDefinitions[obj].resources[res].type;
+	let type = Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].type.toLowerCase();
 	
 	Lwm2mDevKit.logEvent( "TLV-ENC:             "+value+" ("+type+")");
 	
 	switch (type) {
-	case "String":
+	case "string":
 		bytes = Lwm2mDevKit.Copper.str2bytes(value);
 		break;
-	case "Integer":
+	case "integer":
 		bytes = Lwm2mDevKit.Copper.int2bytes(value);
 		if (bytes.length==0) bytes.push(0); // CoAP allows zero-length for 0
 		break;
-	case "Float":
+	case "float":
 		bytes = Lwm2mDevKit.Copper.double2bytes(value);
 		break;
-	case "Boolean":
+	case "boolean":
 		if (value===true) {
 			bytes = [1];
 		} else if (value===false) {
@@ -205,10 +205,10 @@ Lwm2mDevKit.TLV.encodeValue = function(value, obj, ins, res) {
 			Lwm2mDevKit.logError(new Error("Invalid Boolean value in object /"+obj+"/"+ins+"/"+res));
 		}
 		break;
-	case "Opaque":
+	case "opaque":
 		bytes = Lwm2mDevKit.Copper.data2bytes(value);
 		break;
-	case "Time":
+	case "time":
 		bytes = Lwm2mDevKit.Copper.int2bytes(value);
 		if (bytes.length==0) bytes.push(0); // CoAP allows zero-length for 0
 		break;
@@ -298,29 +298,29 @@ Lwm2mDevKit.TLV.decodeValue = function(bytes, obj, ins, res) {
 
 	let value = null;
 	
-	let type = Lwm2mDevKit.objectDefinitions[obj].resources[res].type;
+	let type = Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].type.toLowerCase();
 	
 	switch (type) {
-	case "String":
+	case "string":
 		value = Lwm2mDevKit.Copper.bytes2str(bytes);
 		break;
-	case "Integer":
+	case "integer":
 		value = Lwm2mDevKit.Copper.bytes2int(bytes);
 		break;
-	case "Float":
+	case "float":
 		value = Lwm2mDevKit.Copper.bytes2double(bytes);
 		break;
-	case "Boolean":
+	case "boolean":
 		if (bytes[0]) {
 			value = true;
 		} else {
 			value = false;
 		}
 		break;
-	case "Opaque":
+	case "opaque":
 		value = Lwm2mDevKit.Copper.bytes2data(bytes);
 		break;
-	case "Time":
+	case "time":
 		value = Lwm2mDevKit.Copper.bytes2int(bytes);
 		break;
 	default:
