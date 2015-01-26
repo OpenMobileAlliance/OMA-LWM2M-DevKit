@@ -83,15 +83,15 @@ Lwm2mDevKit.TLV.encode = function(item, obj, ins, res) {
 	
 	// Object
 	if (ins==null) {
-		Lwm2mDevKit.logEvent("TLC-ENC: Encoding Object /"+obj);
+		Lwm2mDevKit.logEvent("TLV-ENC: Encoding Object /"+obj);
 		for (let ins in item) bytes = bytes.concat( Lwm2mDevKit.TLV.encodeObjectInstance(item[ins], obj, ins) );
 	// Object Instance
 	} else if (res==null) {
-		Lwm2mDevKit.logEvent("TLC-ENC: Encoding Object Instance /"+obj+"/"+ins);
+		Lwm2mDevKit.logEvent("TLV-ENC: Encoding Object Instance /"+obj+"/"+ins);
 		for (let res in item) bytes = bytes.concat( Lwm2mDevKit.TLV.encodeResource(item[res], obj, ins, res) );
 	// Resource
 	} else {
-		Lwm2mDevKit.logEvent("TLC-ENC: Encoding Resource /"+obj+"/"+ins+"/"+res);
+		Lwm2mDevKit.logEvent("TLV-ENC: Encoding Resource /"+obj+"/"+ins+"/"+res);
 		bytes = Lwm2mDevKit.TLV.encodeResource(item, obj, ins, res);
 	}
 	
@@ -132,7 +132,7 @@ Lwm2mDevKit.TLV.createHeader = function(typeId, id, len) {
 
 Lwm2mDevKit.TLV.encodeObjectInstance = function(resources, obj, ins) {
 
-	Lwm2mDevKit.logEvent("TLC-ENC:    Object Instance /"+obj+"/"+ins);
+	Lwm2mDevKit.logEvent("TLV-ENC:    Object Instance /"+obj+"/"+ins);
 
 	let value = new Array(0);
 	
@@ -146,11 +146,11 @@ Lwm2mDevKit.TLV.encodeObjectInstance = function(resources, obj, ins) {
 Lwm2mDevKit.TLV.encodeResource = function(resource, obj, ins, res) {
 	
 	if (Lwm2mDevKit.objectDefinitions[obj].resources[res].operations.indexOf('R')==-1) {
-		Lwm2mDevKit.logEvent("TLC-ENC:       Skipping unreadable Resource /"+obj+"/"+ins+"/"+res);
+		Lwm2mDevKit.logEvent("TLV-ENC:       Skipping unreadable Resource /"+obj+"/"+ins+"/"+res);
 		return new Array(0);
 	}
 	
-	Lwm2mDevKit.logEvent("TLC-ENC:       Resource /"+obj+"/"+ins+"/"+res);
+	Lwm2mDevKit.logEvent("TLV-ENC:       Resource /"+obj+"/"+ins+"/"+res);
 	
 	if (Lwm2mDevKit.isObject(resource)) {
 		let value = new Array(0);
@@ -167,7 +167,7 @@ Lwm2mDevKit.TLV.encodeResource = function(resource, obj, ins, res) {
 
 Lwm2mDevKit.TLV.encodeResourceInstance = function(instance, obj, ins, res, id) {
 	
-	Lwm2mDevKit.logEvent("TLC-ENC:          Resource Instance "+id);
+	Lwm2mDevKit.logEvent("TLV-ENC:          Resource Instance "+id);
 
 	let value = Lwm2mDevKit.TLV.encodeValue(instance, obj, ins, res);
 	
@@ -183,7 +183,7 @@ Lwm2mDevKit.TLV.encodeValue = function(value, obj, ins, res) {
 	
 	let type = Lwm2mDevKit.objectDefinitions[obj].resources[res].type;
 	
-	Lwm2mDevKit.logEvent( "TLC-ENC:             "+value+" ("+type+")");
+	Lwm2mDevKit.logEvent( "TLV-ENC:             "+value+" ("+type+")");
 	
 	switch (type) {
 	case "String":
@@ -224,10 +224,10 @@ Lwm2mDevKit.TLV.decode = function(bytes, obj, ins, res) {
 	
 	// Object
 	if (ins==null) {
-		Lwm2mDevKit.logEvent("TLC-DEC: Decoding Object /"+obj);
+		Lwm2mDevKit.logEvent("TLV-DEC: Decoding Object /"+obj);
 	// Object Instance
 	} else if (res==null) {
-		Lwm2mDevKit.logEvent("TLC-DEC: Decoding Object Instance /"+obj+"/"+ins);
+		Lwm2mDevKit.logEvent("TLV-DEC: Decoding Object Instance /"+obj+"/"+ins);
 	}
 	
 	bytes = bytes.slice(0);
@@ -269,23 +269,23 @@ Lwm2mDevKit.TLV.decode = function(bytes, obj, ins, res) {
 		switch (typeCode) {
 		case Lwm2mDevKit.TLV.OBJECT_INSTANCE:
 			if (ins!=null || res!=null) throw new Error("Invalid level for Object Instance TLV");
-			Lwm2mDevKit.logEvent("TLC-DEC:    Object Instance /"+obj+"/"+id);
+			Lwm2mDevKit.logEvent("TLV-DEC:    Object Instance /"+obj+"/"+id);
 			object[id] = Lwm2mDevKit.TLV.decode( value, obj, id );
 			break;
 		case Lwm2mDevKit.TLV.MULTIPLE_RESOURCE:
 			if (obj==null || ins==null) throw new Error("Invalid level for multiple Resource TLV");
-			Lwm2mDevKit.logEvent("TLC-DEC:       Multi-Resource /"+obj+"/"+ins+"/"+id);
+			Lwm2mDevKit.logEvent("TLV-DEC:       Multi-Resource /"+obj+"/"+ins+"/"+id);
 			object[id] = Lwm2mDevKit.TLV.decode( value, obj, ins, id );
 			break;
 		case Lwm2mDevKit.TLV.RESOURCE:
 			if (obj==null) throw new Error("Undefined Object ID for Resource TLV");
-			Lwm2mDevKit.logEvent("TLC-DEC:       Resource /"+obj+"/"+ins+"/"+id);
+			Lwm2mDevKit.logEvent("TLV-DEC:       Resource /"+obj+"/"+ins+"/"+id);
 			object[id] = Lwm2mDevKit.TLV.decodeValue( value, obj, ins, id );
 			break;
 		case Lwm2mDevKit.TLV.RESOURCE_INSTANCE:
 			if (obj==null) throw new Error("Undefined Object ID for Resource TLV");
 			if (res==null) throw new Error("Undefined Resource for Resource Instance TLV");
-			Lwm2mDevKit.logEvent("TLC-DEC:          Resource Instance "+id);
+			Lwm2mDevKit.logEvent("TLV-DEC:          Resource Instance "+id);
 			object[id] = Lwm2mDevKit.TLV.decodeValue( value, obj, ins, res );
 			break;
 		}
@@ -327,7 +327,7 @@ Lwm2mDevKit.TLV.decodeValue = function(bytes, obj, ins, res) {
 		throw new Error("Unknown data type '"+type+"'");
 	}
 	
-	Lwm2mDevKit.logEvent( "TLC-DEC:             "+value+" ("+type+")");
+	Lwm2mDevKit.logEvent( "TLV-DEC:             "+value+" ("+type+")");
 	
 	return value;
 };
