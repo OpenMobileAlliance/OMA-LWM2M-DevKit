@@ -44,7 +44,8 @@ Lwm2mDevKit.InformationReporting.entry.prototype = {
 	message : null,
 	timer : null,
 	number : 1,
-	last : 0
+	last : 0,
+	lastValue : null
 };
 
 Lwm2mDevKit.InformationReporting.relations = { };
@@ -65,6 +66,10 @@ Lwm2mDevKit.InformationReporting.handleObserve = function(message) {
 		operation = 'Observe';
 		entry = new Lwm2mDevKit.InformationReporting.entry(message);
 		Lwm2mDevKit.InformationReporting.addRelationRow(message);
+		
+		if (message.reply.getContentFormat()==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TEXT) {
+			entry.lastValue = message.reply.getPayloadText();
+		}
 	}
 	
 	// enable pmin
@@ -92,7 +97,6 @@ Lwm2mDevKit.InformationReporting.notify = function(path) {
 			Lwm2mDevKit.Tooltips.finish = true;
 			Lwm2mDevKit.Tooltips.nextStep();
 			
-			
 			let pmin = Lwm2mDevKit.InformationReporting.getAttribute(path, 'pmin');
 			let current = Date.now() - entry.last;
 			
@@ -108,6 +112,37 @@ Lwm2mDevKit.InformationReporting.notify = function(path) {
 			} else {
 				
 				Lwm2mDevKit.DeviceManagement.handleRead(entry.message);
+				
+				// conditional observe
+				if (entry.lastValue!==null) {
+					
+					let lt = Number( Lwm2mDevKit.InformationReporting.getAttribute(path, 'lt') );
+					let gt = Number( Lwm2mDevKit.InformationReporting.getAttribute(path, 'gt') );
+					let st = Number( Lwm2mDevKit.InformationReporting.getAttribute(path, 'st') );
+					let pl = entry.message.reply.getPayloadText();
+					
+					if (lt && gt && (Number(pl)>lt || Number(pl)<gt)) {
+						Lwm2mDevKit.logEvent('Dropping Notify for ' + path + ': value='+pl+', gt='+ gt+', lt='+lt);
+						Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Dropping Notify for gt='+ gt + ' and lt='+ lt);
+						return;
+					} else if (lt && Number(pl)>lt) {
+						Lwm2mDevKit.logEvent('Dropping Notify for ' + path + ': value='+pl+', lt='+lt);
+						Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Dropping Notify for lt='+ lt);
+						return;
+					} else if (gt && Number(pl)<gt) {
+						Lwm2mDevKit.logEvent('Dropping Notify for ' + path + ': value='+pl+', gt='+ gt);
+						Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Dropping Notify for gt='+ gt);
+						return;
+					}
+					if (st && Math.abs( Number(entry.lastValue) - Number(pl) ) < st) {
+						Lwm2mDevKit.logEvent('Dropping Notify for ' + path + ': value='+pl+', last='+entry.lastValue+', step='+ st);
+						Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Dropping Notify for st='+ st);
+						return;
+					}
+
+					entry.lastValue = pl;
+				}
+				
 				entry.message.reply.setType(Lwm2mDevKit.Copper.MSG_TYPE_CON);
 				entry.message.reply.setTID(null);
 				entry.message.reply.setCode(Lwm2mDevKit.Copper.CODE_2_04_CHANGED);

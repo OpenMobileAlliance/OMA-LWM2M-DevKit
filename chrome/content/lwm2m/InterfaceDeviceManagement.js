@@ -312,19 +312,32 @@ Lwm2mDevKit.DeviceManagement.handleWriteAttributes = function(message) {
 		return;
 	}
 	
-	let query = message.getUriPath().split('&');
+	let query = message.getUriQuery().split('&');
 	
 	if (res!==undefined) {
+		
+		if (Lwm2mDevKit.client.attributes[obj]===undefined) Lwm2mDevKit.client.attributes[obj] = new Object();
+		if (Lwm2mDevKit.client.attributes[obj][ins]===undefined) Lwm2mDevKit.client.attributes[obj][ins] = new Object();
+		if (Lwm2mDevKit.client.attributes[obj][ins][res]===undefined) Lwm2mDevKit.client.attributes[obj][ins][res] = new Object();
+		
 		for (let i in query) {
 			let pair = query[i].split('=');
+			
 			Lwm2mDevKit.client.attributes[obj][ins][res][pair[0]] = pair[1];
 		}
 	} else if (ins!==undefined) {
+		
+		if (Lwm2mDevKit.client.attributes[obj]===undefined) Lwm2mDevKit.client.attributes[obj] = new Object();
+		if (Lwm2mDevKit.client.attributes[obj][ins]===undefined) Lwm2mDevKit.client.attributes[obj][ins] = new Object();
+		
 		for (let i in query) {
 			let pair = query[i].split('=');
 			Lwm2mDevKit.client.attributes[obj][ins][pair[0]] = pair[1];
 		}
 	} else {
+		
+		if (Lwm2mDevKit.client.attributes[obj]===undefined) Lwm2mDevKit.client.attributes[obj] = new Object();
+		
 		for (let i in query) {
 			let pair = query[i].split('=');
 			Lwm2mDevKit.client.attributes[obj][pair[0]] = pair[1];
