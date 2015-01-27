@@ -369,13 +369,19 @@ Lwm2mDevKit.DeviceManagement.handleExecute = function(message) {
 	
 	// the function was defined by the user locally through the GUI
 	let exec = new Function(Lwm2mDevKit.client.instances[obj][ins][res]);
+	let code = Lwm2mDevKit.Copper.CODE_2_04_CHANGED;
 	
 	if (typeof exec == 'function') {
-		exec();
+		try {
+			exec();
+		} catch (ex) {
+			Lwm2mDevKit.logWarning(ex);
+			code = Lwm2mDevKit.Copper.CODE_5_00_INTERNAL_SERVER_ERROR;
+		}
 	}
 
-	message.respond(Lwm2mDevKit.Copper.CODE_2_04_CHANGED);
-	Lwm2mDevKit.logOperation("Execute", message.getUriPath(), "Success", message);
+	message.respond(code);
+	Lwm2mDevKit.logOperation("Execute", message.getUriPath(), code==Lwm2mDevKit.Copper.CODE_2_04_CHANGED ? "Success" : "Internal Error", message);
 };
 
 
