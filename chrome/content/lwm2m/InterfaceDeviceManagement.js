@@ -108,8 +108,13 @@ Lwm2mDevKit.DeviceManagement.handleRead = function(message) {
 			return;
 		}
 		
-		pl = Lwm2mDevKit.TLV.encode( Lwm2mDevKit.client.instances[obj], obj );
-		cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV;
+		if (message.getAccept()==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON) {
+			pl = Lwm2mDevKit.JSON.encode( Lwm2mDevKit.client.instances[obj], obj );
+			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON;
+		} else {
+			pl = Lwm2mDevKit.TLV.encode( Lwm2mDevKit.client.instances[obj], obj );
+			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV;
+		}
 		
 	} else if (res===undefined) {
 		if (Lwm2mDevKit.client.instances[obj][ins]===undefined) {
@@ -118,8 +123,13 @@ Lwm2mDevKit.DeviceManagement.handleRead = function(message) {
 			return;
 		}
 		
-		pl = Lwm2mDevKit.TLV.encode( Lwm2mDevKit.client.instances[obj][ins], obj, ins );
-		cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV;
+		if (message.getAccept()==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON) {
+			pl = Lwm2mDevKit.JSON.encode( Lwm2mDevKit.client.instances[obj][ins], obj, ins );
+			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON;
+		} else {
+			pl = Lwm2mDevKit.TLV.encode( Lwm2mDevKit.client.instances[obj][ins], obj, ins );
+			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV;
+		}
 		
 	} else {
 		if (Lwm2mDevKit.client.instances[obj][ins][res]===undefined) {
