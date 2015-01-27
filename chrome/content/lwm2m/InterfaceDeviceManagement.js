@@ -389,15 +389,15 @@ Lwm2mDevKit.DeviceManagement.handleCreate = function(message) {
 	let res = path[2];
 	
 	if (res!==undefined) {
-		message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Resource ID given");
+		message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Resource ID given for Create");
 		Lwm2mDevKit.logOperation("Create", message.getUriPath(), "Bad Request", message);
 		return;
 	} else if (ins!==undefined && Lwm2mDevKit.client.instances[obj][ins]!==undefined) {
-		message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Instance exists");
+		message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Instance already exists");
 		Lwm2mDevKit.logOperation("Create", message.getUriPath(), "Bad Request", message);
 		return;
 	} else if (obj===undefined) {
-		message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Object undefined");
+		message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Object ID undefined");
 		Lwm2mDevKit.logOperation("Create", message.getUriPath(), "Bad Request", message);
 		return;
 	} else if (Lwm2mDevKit.client.instances[obj]===undefined) {

@@ -177,6 +177,7 @@ Lwm2mDevKit.TLV.encodeResourceInstance = function(instance, obj, ins, res, id) {
 Lwm2mDevKit.TLV.encodeValue = function(value, obj, ins, res) {
 	
 	if (obj==null) Lwm2mDevKit.logError(new Error('No Object ID given'));
+	if (ins==null) Lwm2mDevKit.logError(new Error('No Instance ID given'));
 	if (res==null) Lwm2mDevKit.logError(new Error('No Resource ID given'));
 	
 	let bytes = null;
