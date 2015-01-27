@@ -150,6 +150,9 @@ Lwm2mDevKit.Registration.onUpdate = function(message) {
 
 Lwm2mDevKit.Registration.deregister = function() {
 	
+	// cancel all before response, since this is what we want to do anyhow
+	Lwm2mDevKit.InformationReporting.cancelAll();
+	
 	try {
 		if (!Lwm2mDevKit.registrationHandle) throw new Error('No registration handle');
 		

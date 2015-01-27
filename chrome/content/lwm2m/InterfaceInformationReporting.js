@@ -182,7 +182,7 @@ Lwm2mDevKit.InformationReporting.cancelAll = function() {
 		if (entry.timer) window.clearTimeout(entry.timer);
 
 		let rows = document.getElementById('reporting_relations');
-		rows.removeChild( document.getElementById('reporting_relation_'+cancel) );
+		rows.removeChild( document.getElementById('reporting_relation_'+token) );
 		
 		delete Lwm2mDevKit.InformationReporting.relations[token];
 	}
