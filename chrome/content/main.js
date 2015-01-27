@@ -108,6 +108,9 @@ Lwm2mDevKit.main = function() {
 		element = document.getElementById("panel_reporting");
 		element.addEventListener('popupshowing', Lwm2mDevKit.Tooltips.nextStep, true);
 		
+		element = document.getElementById("reporting_relations");
+		element.addEventListener('keypress', Lwm2mDevKit.InformationReporting.cancelManually, true);
+		
 		element = document.getElementById("tooltip");
 		element.addEventListener('click', Lwm2mDevKit.Tooltips.clickThrough, true);
 		

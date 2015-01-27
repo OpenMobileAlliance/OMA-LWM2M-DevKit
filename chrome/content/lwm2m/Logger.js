@@ -81,9 +81,8 @@ Lwm2mDevKit.logMessage = function(message, out) {
 	item.appendChild(cell);
 
 	rows.appendChild( item );
-	
-	item.focus();
-	//rows.ensureElementIsVisible(item);
+
+	rows.ensureElementIsVisible(item);
 };
 
 
@@ -113,8 +112,7 @@ Lwm2mDevKit.logOperation = function(operation, path, outcome, message) {
 	
 	Lwm2mDevKit.operationLog[Lwm2mDevKit.operationLog.length] = message;
 
-	item.focus();
-	//rows.ensureElementIsVisible(item);
+	rows.ensureElementIsVisible(item);
 };
 
 Lwm2mDevKit.showOperation = function(index) {
@@ -255,8 +253,7 @@ Lwm2mDevKit.logOperationReporting = function(operation, path, outcome, message) 
 	
 	Lwm2mDevKit.operationReportingLog[Lwm2mDevKit.operationReportingLog.length] = message;
 
-	item.focus();
-	//rows.ensureElementIsVisible(item);
+	rows.ensureElementIsVisible(item);
 };
 
 Lwm2mDevKit.showOperationReporting = function(index) {

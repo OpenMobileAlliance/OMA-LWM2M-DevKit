@@ -175,6 +175,15 @@ Lwm2mDevKit.InformationReporting.cancel = function(cancel, message) {
 	Lwm2mDevKit.logWarning("Observe relation "+cancel+" not found");
 };
 
+Lwm2mDevKit.InformationReporting.cancelManually = function(event) {
+	
+	if (event.key!='Del') return;
+	
+	let rows = document.getElementById('reporting_relations');
+	if (!rows.selectedItem) return;
+	Lwm2mDevKit.InformationReporting.cancel( rows.selectedItem.token );
+};
+
 Lwm2mDevKit.InformationReporting.cancelAll = function() {
 
 	for (let token in Lwm2mDevKit.InformationReporting.relations) {
@@ -222,6 +231,7 @@ Lwm2mDevKit.InformationReporting.addRelationRow = function(message) {
 	
 	var item = document.createElement('listitem');
 	item.setAttribute('id', 'reporting_relation_'+token);
+	item.token = token;
 
 	var cell = document.createElement('listcell');
 	cell.setAttribute('label', token);
