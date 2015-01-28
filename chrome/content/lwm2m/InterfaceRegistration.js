@@ -119,7 +119,8 @@ Lwm2mDevKit.Registration.update = function() {
 		
 		
 		var message = new Lwm2mDevKit.CoapMessage(Lwm2mDevKit.getRequestType(), Lwm2mDevKit.Copper.PUT, uri, null);
-		message.setContentType(Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_LINK_FORMAT);
+		// only set the Content-Format when sending an Update payload
+		//message.setContentType(Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_LINK_FORMAT);
 		
 		Lwm2mDevKit.coapEndpoint.send( message, Lwm2mDevKit.Registration.onUpdate);
 	} catch (ex) {
@@ -157,7 +158,6 @@ Lwm2mDevKit.Registration.deregister = function() {
 		if (!Lwm2mDevKit.registrationHandle) throw new Error('No registration handle');
 		
 		var message = new Lwm2mDevKit.CoapMessage(Lwm2mDevKit.getRequestType(), Lwm2mDevKit.Copper.DELETE, Lwm2mDevKit.registrationHandle, null);
-		message.setContentType(Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_LINK_FORMAT);
 		
 		Lwm2mDevKit.coapEndpoint.send( message, Lwm2mDevKit.Registration.onDeregister);
 	} catch (ex) {
