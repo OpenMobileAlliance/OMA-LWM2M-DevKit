@@ -753,6 +753,9 @@ Lwm2mDevKit.Copper.hex2bytes = function(h) {
 };
 
 Lwm2mDevKit.Copper.bytes2hex = function(b) {
+	
+	if (!b) return "empty";
+	
 	var hex = '0x';
 	if (Array.isArray(b) && b.length==0) {
 		hex += '00';
