@@ -259,9 +259,11 @@ Lwm2mDevKit.showObjectDefinition = function(obj) {
 	while (cell.firstChild) {
 		cell.removeChild(cell.firstChild);
 	}
+	
 	// add field for Instance ID
-	let multi = false;
-	if (Lwm2mDevKit.objectDefinitions[obj]['instances']=='multiple') {
+	let multi = definition.instancetype=='multiple';
+	
+	if (multi) {
 		let input = document.createElement('textbox');
 		input.setAttribute('size', '1');
 		input.setAttribute('class', 'resvalue');
@@ -270,12 +272,10 @@ Lwm2mDevKit.showObjectDefinition = function(obj) {
 		input.setAttribute('value', parseInt(Object.keys(Lwm2mDevKit.client.instances[obj]).pop())+1);
 		
 		cell.appendChild(input);
-		multi = true;
 	}
 	// button
-	if (Lwm2mDevKit.objectDefinitions[obj]['instances']=='multiple' ||
-		Lwm2mDevKit.client.instances[obj]===undefined ||
-		Lwm2mDevKit.client.instances[obj][0]===undefined) {
+	if (multi ||
+		Lwm2mDevKit.client.instances[obj]===undefined || Lwm2mDevKit.client.instances[obj].length===0) {
 		
 		let input = document.createElement('button');
 		input.setAttribute('flex', '1');

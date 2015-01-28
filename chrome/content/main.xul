@@ -436,7 +436,7 @@
 								<column style="width: 6em;" />
 								<column style="width: 6em;" />
 								<column flex="1" />
-								<column style="width: 20em;" />
+								<column style="width: 17em;" />
 							</columns>
 							<rows style="overflow: hidden;">
 								<row>
@@ -445,7 +445,7 @@
 									<listheader style="text-align: center;" label="Instances" />
 									<listheader style="text-align: center;" label="Mandatory" />
 									<listheader label="Description" />
-									<listheader label="Instances" />
+									<listheader label="Instantiation" />
 								</row>
 								<row style="height: 2em; font-size: 120%; font-weight: bold;">
 									<listcell id="object_id" style="text-align: center;" />
