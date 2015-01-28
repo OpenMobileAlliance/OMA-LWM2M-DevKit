@@ -67,8 +67,10 @@
 	<keyset>
 		<key key="h" oncommand="Lwm2mDevKit.Tooltips.help();" />
 		<key key="e" oncommand="Lwm2mDevKit.loadDefaultLWM2MDevice();" />
-		<key key="r" oncommand="if (Lwm2mDevKit.client!=null) Lwm2mDevKit.Registration.register();" />
 		<key key="c" oncommand="Lwm2mDevKit.enableCreateRows();" />
+		<key key="r" oncommand="if (Lwm2mDevKit.client!=null) Lwm2mDevKit.Registration.register();" />
+		<key key="u" oncommand="if (Lwm2mDevKit.registrationHandle!=null) Lwm2mDevKit.Registration.update();" />
+		<key key="d" oncommand="if (Lwm2mDevKit.registrationHandle!=null) Lwm2mDevKit.Registration.deregister();" />
 	</keyset>
 	
 	<panel id="tooltip" consumeoutsideclicks="false" noautofocus="true" class="tooltip" style="opacity: 0.8; font-size: 18px; cursor: pointer; -moz-appearance: none; height: 200px; width: 200px; background-color: #BB3C36; color: white; border-radius: 100px; border: 3px solid white;">
@@ -575,7 +577,7 @@
 				<grippy/>
 			</splitter>
 			
-			<box height="130">
+			<box height="216">
 			
 			<groupbox flex="1">
 				<caption label="CoAP Message Log" />
