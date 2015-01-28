@@ -90,31 +90,37 @@ Lwm2mDevKit.InformationReporting.notify = function(path) {
 	
 	for (let token in Lwm2mDevKit.InformationReporting.relations) {
 		let entry = Lwm2mDevKit.InformationReporting.relations[token];
+		let opath = entry.message.getUriPath();
 		
-		if (entry.message.getUriPath()==path) {
+		// same path or shorter path (actually ending with EOF
+		if (opath==path || ( path.startsWith(opath) && (path[opath.length]=='/' || path[opath.length]===undefined) )) {
+		
+			Lwm2mDevKit.logEvent("Notify for "+path+" triggering "+token+ " ("+opath+")");
 			
 			// notify is the last tutorial action
 			Lwm2mDevKit.Tooltips.finish = true;
 			Lwm2mDevKit.Tooltips.nextStep();
 			
-			let pmin = Lwm2mDevKit.InformationReporting.getAttribute(path, 'pmin');
+			let pmin = Lwm2mDevKit.InformationReporting.getAttribute(opath, 'pmin');
 			let current = Date.now() - entry.last;
 			
 			if (current < pmin*1000) {
+				
 				if (entry.timer) window.clearTimeout(entry.timer);
 				entry.timer = window.setTimeout(
 						function() {
-							Lwm2mDevKit.InformationReporting.notify(path);
+							Lwm2mDevKit.InformationReporting.notify(opath);
 						}, pmin*1000 - current);
 				Lwm2mDevKit.InformationReporting.relations[token] = entry;
 				
 				Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Postponing Notify for pmin='+ pmin);
+				
 			} else {
 				
 				Lwm2mDevKit.DeviceManagement.handleRead(entry.message);
 				
 				// conditional observe
-				if (entry.lastValue!==null) {
+				if (opath==path && entry.lastValue!==null) {
 					
 					let lt = Number( Lwm2mDevKit.InformationReporting.getAttribute(path, 'lt') );
 					let gt = Number( Lwm2mDevKit.InformationReporting.getAttribute(path, 'gt') );
@@ -139,7 +145,7 @@ Lwm2mDevKit.InformationReporting.notify = function(path) {
 						Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Dropping Notify for st='+ st);
 						return;
 					}
-
+					
 					entry.lastValue = pl;
 				}
 				
@@ -150,7 +156,7 @@ Lwm2mDevKit.InformationReporting.notify = function(path) {
 				
 				let value = '';
 				if (entry.message.reply.isPrintable()) value = ": " +  entry.message.reply.getPayloadText();
-				Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Notify for '+ path + value);
+				Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Notify for '+ opath + value);
 			}
 		}
 	}
