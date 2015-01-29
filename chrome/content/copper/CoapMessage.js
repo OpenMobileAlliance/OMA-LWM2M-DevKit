@@ -794,6 +794,7 @@ Lwm2mDevKit.CoapMessage.prototype = {
 			case Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_SOAP_FASTINFOSET:
 			case Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_X_OBIX_BINARY:
 			case Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV:
+			case Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_OPAQUE:
 			default:
 				return false;
 		}

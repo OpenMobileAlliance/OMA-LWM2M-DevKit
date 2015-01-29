@@ -273,6 +273,16 @@ Lwm2mDevKit.DeviceManagement.handleWrite = function(message) {
 			}
 			
 			pl = message.getPayloadText();
+			
+		} else if (cf==Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_OPAQUE) {
+			// does not work for Resource Instances
+			if (Lwm2mDevKit.objectDefinitions[obj].resourcedefs[res].instancetype=="multiple") {
+				message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Use TLV to write Multi-Resource");
+				Lwm2mDevKit.logOperation("Write", message.getUriPath(), "Bad Request", message);
+				return;
+			}
+			
+			pl = message.getPayload();
 		} else {
 			message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Unsupported Content-Format");
 			Lwm2mDevKit.logOperation("Write", message.getUriPath(), "Unsupported Content-Format", message);

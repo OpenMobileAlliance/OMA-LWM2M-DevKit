@@ -103,6 +103,7 @@ Lwm2mDevKit.Copper.getContentFormatName = function(type) {
 	case Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TEXT: return 'application/vnd.oma.lwm2m+text'; break;
 	case Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV: return 'application/vnd.oma.lwm2m+tlv'; break;
 	case Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON: return 'application/vnd.oma.lwm2m+json'; break;
+	case Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_OPAQUE: return 'application/vnd.oma.lwm2m+opaque'; break;
 	default: return 'unknown';
 	}
 	return '';
@@ -197,6 +198,7 @@ Lwm2mDevKit.Copper.__defineGetter__("CONTENT_TYPE_APPLICATION_X_OBIX_BINARY", fu
 Lwm2mDevKit.Copper.__defineGetter__("CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TEXT", function() { return 1541; });
 Lwm2mDevKit.Copper.__defineGetter__("CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TLV", function() { return 1542; });
 Lwm2mDevKit.Copper.__defineGetter__("CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON", function() { return 1543; });
+Lwm2mDevKit.Copper.__defineGetter__("CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_OPAQUE", function() { return 1544; });
 
 Lwm2mDevKit.Copper.__defineGetter__("GET", function() { return 1; });
 Lwm2mDevKit.Copper.__defineGetter__("POST", function() { return 2; });
