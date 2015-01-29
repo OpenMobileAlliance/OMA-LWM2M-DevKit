@@ -431,6 +431,9 @@ Lwm2mDevKit.CoapMessage.prototype = {
 	},
 	setToken : function(token) {
 		
+		// if copying an empty token
+		if (!token) return;
+		
 		if (!Array.isArray(token)) {
 			if (token.substr(0,2)=='0x') {
 				token = Lwm2mDevKit.Copper.hex2bytes(token);
