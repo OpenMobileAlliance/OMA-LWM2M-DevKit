@@ -43,7 +43,6 @@ Lwm2mDevKit.defaultHandler = function(message) {
 	Lwm2mDevKit.logWarning(new Error('Received unexpected CoAP message:\n'+message.getSummary()));
 };
 
-//Handle ping responses
 Lwm2mDevKit.pingHandler = function(message) {
 	
 	document.getElementById('ping_info').style.color = '#006600';
@@ -54,6 +53,12 @@ Lwm2mDevKit.pingHandler = function(message) {
 	document.getElementById('button_ping').style.borderColor = '#00CC00';
 	document.getElementById('button_ping').label = 'Ready';
 	
+};
+
+Lwm2mDevKit.observeHandler = function(message) {
+	// check observe cancellation
+	if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_RST)
+		Lwm2mDevKit.InformationReporting.cancelByMID(message.getMID(), message);
 };
 
 // Handle messages with block-wise transfer

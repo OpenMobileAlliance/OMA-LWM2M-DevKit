@@ -72,7 +72,8 @@ Lwm2mDevKit.CoapMessage.prototype = {
 		var ret = '';
 		ret += ' Type: '+this.getType(true);
 		ret += '\n Code: '+this.getCode(true);
-		ret += '\n Message ID: '+this.getTID();
+		ret += '\n Message ID: '+this.getMID();
+		ret += '\n Token: '+this.getToken();
 		if (this.getOptions().length>0) {
 			ret += '\n Options:'+this.getOptions(true);
 		}
@@ -120,11 +121,18 @@ Lwm2mDevKit.CoapMessage.prototype = {
 		this.packet.code = code;
 	},
 	
-	getTID : function() {
-		return this.packet.tid;
+	getMID : function() {
+		return this.packet.mid;
 	},
-	setTID : function(id) {
-		this.packet.tid = id;
+	setMID : function(id) {
+		this.packet.mid = id;
+	},
+
+	getToken : function(readable) {
+		return this.packet.getToken(); // byte array, treat as hex string | "empty"
+	},
+	setToken : function(token) {
+		this.packet.setToken(token);
 	},
 	
 	getRetries : function() {
@@ -153,52 +161,6 @@ Lwm2mDevKit.CoapMessage.prototype = {
 		return Math.floor(this.getCode() / 32) == 5;
 	},
 	
-	/*
-	 * Option definitions for different versions
-	 * 
-	draft-05                            draft-03                            draft-00
-	const Lwm2mDevKit.Copper.OPTION_CONTENT_TYPE = 1;		const Lwm2mDevKit.Copper.OPTION_CONTENT_TYPE = 1;		const Lwm2mDevKit.Copper.OPTION_CONTENT_TYPE = 0;
-										MUST be supported, once
-										
-	const Lwm2mDevKit.Copper.OPTION_MAX_AGE = 2;			const Lwm2mDevKit.Copper.OPTION_MAX_AGE = 2;			const Lwm2mDevKit.Copper.OPTION_MAX_AGE = 3;
-										once
-										
-	const Lwm2mDevKit.Copper.OPTION_PROXY_URI = 3;			
-	
-	const Lwm2mDevKit.Copper.OPTION_ETAG = 4;				const Lwm2mDevKit.Copper.OPTION_ETAG = 4;				const Lwm2mDevKit.Copper.OPTION_ETAG = 4;
-										SHOULD be included for cache refresh, multiple
-										
-	const Lwm2mDevKit.Copper.OPTION_URI_HOST = 5;			const Lwm2mDevKit.Copper.OPTION_URI_AUTH = 5;			const Lwm2mDevKit.Copper.OPTION_URI = 1;
-										MUST be supported by proxy
-										SHOULD be included if known, once
-										
-	const Lwm2mDevKit.Copper.OPTION_LOCATION_PATH = 6;		const Lwm2mDevKit.Copper.OPTION_LOCATION = 6;
-										MAY be included for 30x response, once
-										
-	const Lwm2mDevKit.Copper.OPTION_URI_PORT = 7;
-	
-	const Lwm2mDevKit.Copper.OPTION_LOCATION_QUERY = 8;
-	
-	const Lwm2mDevKit.Copper.OPTION_URI_PATH = 9;			const Lwm2mDevKit.Copper.OPTION_URI_PATH = 9;			const Lwm2mDevKit.Copper.OPTION_URI = 1;
-										MUST be supported, once
-										
-	const Lwm2mDevKit.Copper.OPTION_OBSERVE = 10;			const Lwm2mDevKit.Copper.OPTION_SUB_LIFETIME = 10;		const Lwm2mDevKit.Copper.OPTION_SUB_LIFETIME = 6;
-	
-	const Lwm2mDevKit.Copper.OPTION_TOKEN = 11;			const Lwm2mDevKit.Copper.OPTION_TOKEN = 11;
-										MUST be included for delayed response (SHOULD omit Uri), once
-										If delayed and no option in req, return 240
-										
-	const Lwm2mDevKit.Copper.OPTION_BLOCK = 13;			const Lwm2mDevKit.Copper.OPTION_BLOCK = 13;
-	
-	const Lwm2mDevKit.Copper.OPTION_NOOP = 14;				const Lwm2mDevKit.Copper.OPTION_NOOP = 14;
-	
-	const Lwm2mDevKit.Copper.OPTION_URI_QUERY = 15;		const Lwm2mDevKit.Copper.OPTION_URI_QUERY = 15;		const Lwm2mDevKit.Copper.OPTION_URI = 1;
-										MUST be supported, once
-																			const Lwm2mDevKit.Copper.OPTION_URI_CODE = 2;
-																			const Lwm2mDevKit.Copper.OPTION_DATE = 5;
-	*/
-	
-	// Lwm2mDevKit.Copper.OPTION_CONTENT_TYPE:00+
 	getContentFormat : function(readable) {
 		var opt = this.packet.getOption(Lwm2mDevKit.Copper.OPTION_CONTENT_TYPE); // integer
 
@@ -412,7 +374,6 @@ Lwm2mDevKit.CoapMessage.prototype = {
 		
 		if (optLen+optLen2<=0) return null;
 		
-		
 		if (readable) {
 			var multiple = opt.match(/\/|&/g);
 			var decoded = 1 + (multiple!=null ? multiple.length : 0) + (optLen2>0 ? 1 : 0);
@@ -422,31 +383,6 @@ Lwm2mDevKit.CoapMessage.prototype = {
 			if (opt) opt = '/'+opt;
 			return opt;
 		}
-	},
-	
-	// Lwm2mDevKit.Copper.OPTION_TOKEN:03+
-	getToken : function(readable) {
-		if (readable && this.packet.getOption(Lwm2mDevKit.Copper.OPTION_TOKEN)==null) return 'empty';
-		return this.packet.getOption(Lwm2mDevKit.Copper.OPTION_TOKEN); // byte array, treat as hex string
-	},
-	setToken : function(token) {
-		
-		// if copying an empty token
-		if (!token) return;
-		
-		if (!Array.isArray(token)) {
-			if (token.substr(0,2)=='0x') {
-				token = Lwm2mDevKit.Copper.hex2bytes(token);
-			} else {
-				token = Lwm2mDevKit.Copper.str2bytes(token);
-			}
-		}
-		
-		while (token.length > Lwm2mDevKit.Copper.TOKEN_LENGTH) {
-			token.pop();
-			Lwm2mDevKit.logEvent('WARNING: CoapMessage.setToken [token must be 1-'+Lwm2mDevKit.Copper.TOKEN_LENGTH+' bytes; masking to '+Lwm2mDevKit.Copper.TOKEN_LENGTH+' bytes]');
-		}
-		this.packet.setOption(Lwm2mDevKit.Copper.OPTION_TOKEN, token);
 	},
 	
 	// Lwm2mDevKit.Copper.OPTION_ACCEPT:07+
@@ -664,7 +600,6 @@ Lwm2mDevKit.CoapMessage.prototype = {
 			var ret = '';
 
 			for (let optTypeIt in this.packet.options) {
-				if (optTypeIt==Lwm2mDevKit.Copper.OPTION_TOKEN) continue;
 				
 				if (Array.isArray(this.packet.options[optTypeIt][1])) {
 					
@@ -814,8 +749,8 @@ Lwm2mDevKit.CoapMessage.prototype = {
 	// maybe more arguments needed 
 	respond : function(code, payload, format) {
 		this.reply = new Lwm2mDevKit.CoapMessage(Lwm2mDevKit.Copper.MSG_TYPE_ACK, code, null, payload);
-		this.reply.setTID(this.getTID());
-		this.reply.setToken(this.packet.getOption(Lwm2mDevKit.Copper.OPTION_TOKEN));
+		this.reply.setMID(this.getMID());
+		this.reply.setToken(this.getToken());
 		
 		if (format) this.reply.setContentType(format);
 	},

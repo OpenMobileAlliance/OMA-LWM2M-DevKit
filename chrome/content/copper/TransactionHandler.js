@@ -52,15 +52,15 @@ Lwm2mDevKit.Transaction.prototype = {
 
 Lwm2mDevKit.TransactionHandler = function(myClient) {
 	
-	this.tid = 0xFFFF & parseInt( Math.random() * 0x10000);
-	
 	this.client = myClient;
 	this.client.register( Lwm2mDevKit.myBind(this, this.handle) );
+	
+	this.midGenerator = parseInt(Math.random()*0x10000);
 	
 	this.transactions = new Object();
 	this.requests = new Object();
 	this.registeredTokens = new Object();
-	this.registeredTIDs = new Object();
+	this.registeredMIDs = new Object();
 	this.dupFilter = new Array();
 	this.dupCache = new Object();
 	
@@ -69,7 +69,7 @@ Lwm2mDevKit.TransactionHandler = function(myClient) {
 
 Lwm2mDevKit.TransactionHandler.prototype = {
 
-	tid : 0,
+	midGenerator : 0,
 
 	client : null,
 	defaultCB : null,
@@ -78,7 +78,7 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 	
 	requests : null,
 	registeredTokens : null,
-	registeredTIDs : null,
+	registeredMIDs : null,
 	
 	dupFilter : null,
 	dupCache : null,
@@ -87,21 +87,31 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 		this.defaultCB = myCB;
 	},
 	
-	incTID : function() {
-		this.tid = 0xFFFF & (this.tid+1);
-		return this.tid;
+	nextMID : function() {
+		this.midGenerator = (this.midGenerator+1) % 0x10000;
+		//return Math.pow(2, this.midGenerator) % 419;
+		return this.midGenerator;
+	},
+	
+	stopRetransmission : function(token) {
+		for (let mid in this.transactions) {
+			if (this.transactions[mid].message.getToken()==token) {
+				if (this.transactions[mid].timer) {
+					window.clearTimeout(this.transactions[mid].timer);
+				}
+				Lwm2mDevKit.logEvent('INFO: Stopping MID '+mid);
+				delete this.transactions[mid];
+			}
+		}
 	},
 	
 	stopRetransmissions : function() {
-		for (let t in this.transactions) {
-			// only cancel default transactions corresponding to the user requests
-			if (this.transactions[t] && this.transactions[t].cb==null) {
-				if (this.transactions[t].timer) {
-					window.clearTimeout(this.transactions[t].timer);
-				}
-				delete this.transactions[t];
-				Lwm2mDevKit.logEvent('INFO: TransactionHandler.cancelTransactions [canceled message '+t+']');
+		for (let mid in this.transactions) {
+			if (this.transactions[mid].timer) {
+				window.clearTimeout(this.transactions[mid].timer);
 			}
+			Lwm2mDevKit.logEvent('INFO: Stopping MID '+mid);
+			delete this.transactions[mid];
 		}
 	},
 	
@@ -110,7 +120,7 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 		
 		this.requests = new Object();
 		this.registeredTokens = new Object();
-		this.registeredTIDs = new Object();
+		this.registeredMIDs = new Object();
 	},
 	
 	registerToken : function(token, cb) {
@@ -133,24 +143,24 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 		if (this.client.ended) return;
 		
 		// set MID for message
-		if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON || message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_NON) {
-			message.setTID( this.incTID() );
+		if (message.getMID()==-1) {
+			message.setMID( this.nextMID() );
 		}
 		
-		var that = this; // struggling with the JavaScript scope thing...
+		var that = this; // coping with the JavaScript scope...
 		var timer = null;
 		
 		// store reliable transaction
 		if (message.isConfirmable()) {
 			if (Lwm2mDevKit.behavior.retransmissions) {
 				// schedule resend without RANDOM_FACTOR since we already have human jitter
-				timer = window.setTimeout(function(){Lwm2mDevKit.myBind(that,that.resend(message.getTID()));}, Lwm2mDevKit.Copper.RESPONSE_TIMEOUT);
+				timer = window.setTimeout(function(){Lwm2mDevKit.myBind(that,that.resend(message.getMID()));}, Lwm2mDevKit.Copper.RESPONSE_TIMEOUT);
 			} else {
 				// also schedule 'not responding' timeout when retransmissions are disabled 
-				timer = window.setTimeout(function(){Lwm2mDevKit.myBind(that,that.resend(message.getTID()));}, 16000); // 16 seconds
+				timer = window.setTimeout(function(){Lwm2mDevKit.myBind(that,that.resend(message.getMID()));}, 16000); // 16 seconds
 			}
-			Lwm2mDevKit.logEvent('INFO: Storing MID '+ message.getTID());
-			this.transactions[message.getTID()] = new Lwm2mDevKit.Transaction(message, timer);
+			Lwm2mDevKit.logEvent('INFO: Storing MID '+ message.getMID());
+			this.transactions[message.getMID()] = new Lwm2mDevKit.Transaction(message, timer);
 		}
 		
 		// store request callback through token matching
@@ -158,15 +168,20 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 			
 			while (this.requests[message.getToken()]!=null && this.registeredTokens[message.getToken()]==null) {
 				Lwm2mDevKit.logEvent('INFO: Default token already in use');
-				message.setToken(new Array([parseInt(Math.random()*0x100)]));
+				message.setToken([parseInt(Math.random()*0x100), parseInt(Math.random()*0x100)]);
 			}
 			this.requests[message.getToken()] = reqCB==null ? this.defaultCB : reqCB;
 			
-			// also save callback by TID
-			this.registeredTIDs[message.getTID()] = this.requests[message.getToken()];
+			// also save callback by MID
+			this.registeredMIDs[message.getMID()] = this.requests[message.getToken()];
+		
+		// store notification (needed for NON)
+		} else if (message.isResponse() && message.getObserve()!=null) {
+			this.registeredMIDs[message.getMID()] = reqCB;
+		
 		// store ping
 		} else if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON && message.getCode()==0) {
-			this.registeredTIDs[message.getTID()] = reqCB;
+			this.registeredMIDs[message.getMID()] = reqCB;
 		}
 
 		Lwm2mDevKit.logMessage(message, true);
@@ -174,25 +189,26 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 		this.client.send( message.serialize() );
 	},
 	
-	resend : function(tid) {
-		if (Lwm2mDevKit.behavior.retransmissions && this.transactions[tid]!==undefined && (this.transactions[tid].message.getRetries() < Lwm2mDevKit.Copper.MAX_RETRANSMIT)) {
+	resend : function(mid) {
+		if (Lwm2mDevKit.behavior.retransmissions && this.transactions[mid]!==undefined && (this.transactions[mid].message.getRetries() < Lwm2mDevKit.Copper.MAX_RETRANSMIT)) {
 			
 			var that = this;
-			this.transactions[tid].message.incRetries();
+			this.transactions[mid].message.incRetries();
 			
-			var timeout = Lwm2mDevKit.Copper.RESPONSE_TIMEOUT*Math.pow(2,this.transactions[tid].message.getRetries());
-			this.transactions[tid].timer = window.setTimeout(function(){Lwm2mDevKit.myBind(that,that.resend(tid));}, timeout);
+			var timeout = Lwm2mDevKit.Copper.RESPONSE_TIMEOUT*Math.pow(2,this.transactions[mid].message.getRetries());
+			this.transactions[mid].timer = window.setTimeout(function(){Lwm2mDevKit.myBind(that,that.resend(mid));}, timeout);
 			
-			Lwm2mDevKit.logMessage(this.transactions[tid].message, true);
+			Lwm2mDevKit.logMessage(this.transactions[mid].message, true);
 			
-			this.client.send( this.transactions[tid].message.serialize() );
+			this.client.send( this.transactions[mid].message.serialize() );
 			
-			Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Re-transmitting message '+tid+' ('+this.transactions[tid].message.getRetries()+'/'+Lwm2mDevKit.Copper.MAX_RETRANSMIT+')');
+			Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Re-transmitting message '+mid+' ('+this.transactions[mid].message.getRetries()+'/'+Lwm2mDevKit.Copper.MAX_RETRANSMIT+')');
+		
 		} else {
-			delete this.transactions[tid];
-			Lwm2mDevKit.logEvent('WARNING: Message ' + tid + ' timed out.');
+			Lwm2mDevKit.logWarning('Message ' + mid + ' timed out.');
+			this.cancelTransactions();
+			delete this.transactions[mid];
 			Lwm2mDevKit.InformationReporting.cancelAll();
-			Lwm2mDevKit.coapEndpoint.cancelTransactions();
 			Lwm2mDevKit.Registration.onDeregister();
 		}
 	},
@@ -204,81 +220,66 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 		
 		Lwm2mDevKit.logMessage(message, false);
 		
-		if (this.transactions[message.getTID()]) {
+		if (this.transactions[message.getMID()]) {
 			// calculate round trip time
-			var ms = (new Date().getTime() - this.transactions[message.getTID()].rttStart);
+			var ms = (new Date().getTime() - this.transactions[message.getMID()].rttStart);
 			message.getRTT = function() { return ms; };
 
 			// stop retransmission
-			Lwm2mDevKit.logEvent('INFO: Closing MID ' + message.getTID() );
-			if (this.transactions[message.getTID()].timer) window.clearTimeout(this.transactions[message.getTID()].timer);
-			
-			// check observe cancellation
-			if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_RST && this.transactions[message.getTID()].message.getObserve())
-				Lwm2mDevKit.InformationReporting.cancel(this.transactions[message.getTID()].message.getToken(true), message);
+			Lwm2mDevKit.logEvent('INFO: Closing MID ' + message.getMID() );
+			if (this.transactions[message.getMID()].timer) window.clearTimeout(this.transactions[message.getMID()].timer);
 			
 			// clear transaction
-			delete this.transactions[message.getTID()];
+			delete this.transactions[message.getMID()];
 			
 		// filter duplicates
-		} else if (this.dupFilter.indexOf(message.getTID()) != -1) {
+		} else if (this.dupFilter.indexOf(message.getMID()) != -1) {
 			
 			if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON) {
-				var reply = this.dupCache[message.getTID()];
+				var reply = this.dupCache[message.getMID()];
 				if (reply) {
-					Lwm2mDevKit.logEvent('INFO: Replying to duplicate (Message ID: '+message.getTID()+')');
+					Lwm2mDevKit.logEvent('INFO: Replying to duplicate (Message ID: '+message.getMID()+')');
 					this.send(reply);
 				} else if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON) {
-					Lwm2mDevKit.logEvent('INFO: Acknowledging duplicate (Message ID: '+message.getTID()+')');
-					this.ack(message.getTID());
+					Lwm2mDevKit.logEvent('INFO: Acknowledging duplicate (Message ID: '+message.getMID()+')');
+					this.ack(message.getMID());
 				}
 			} else {
-				Lwm2mDevKit.logEvent('INFO: Ignoring duplicate (Message ID: '+message.getTID()+')');
+				Lwm2mDevKit.logEvent('INFO: Ignoring duplicate (Message ID: '+message.getMID()+')');
 			}
 			return;
+		
+		// implicit acknowledgement
+		} else if (message.isResponse()) {
+			
 		}
 
 		// callback for message
 		var callback = null;
-		
-		// Empty messages
-		if (message.getCode()==0) {
-		
-			if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_ACK) {
-				callback = this.registeredTIDs[message.getTID()];
-				delete this.registeredTIDs[message.getTID()];
-				
-			} else if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_RST) {
-				callback = this.registeredTIDs[message.getTID()];
-				delete this.registeredTIDs[message.getTID()];
-				
-			}
 			
 		// Requests
-		} else if (message.getCode()<32) {
+		if (message.isRequest()) {
 			
 			callback = Lwm2mDevKit.serverHandler;
 			
 		// Responses
-		} else {
-			
+		} else if (message.isResponse()) {
 			// request matching by token
 			if (this.requests[message.getToken()]) {
 				
-				if (!this.registeredTIDs[message.getTID()]) {
-					if (message.getType()!=Lwm2mDevKit.Copper.MSG_TYPE_CON && message.getType()!=Lwm2mDevKit.Copper.MSG_TYPE_NON) {
-						Lwm2mDevKit.logEvent('WARNING: TransactionHandler.handle [wrong type for separate from server: '+message.getType(true)+']');
-					} else {
-						Lwm2mDevKit.logEvent('INFO: Incoming separate reponse (Token: '+message.getToken()+')');
+				// implicit acknowledgement
+				if (!this.registeredMIDs[message.getMID()]) {
+					if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON || message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_NON) {
+						Lwm2mDevKit.logEvent('INFO: Implicit acknowledgement for token: '+message.getToken() );
 						// implicit acknowledgement
-						this.stopRetransmissions();
+						this.stopRetransmission(message.getToken());
 					}
 				}
 
 				callback = this.requests[message.getToken()];
 				
 				delete this.requests[message.getToken()];
-				delete this.registeredTIDs[message.getTID()];
+				delete this.registeredMIDs[message.getMID()];
 			
 			// check registered Tokens, e.g., subscriptions
 			} else if (this.registeredTokens[message.getToken()]) {
@@ -289,44 +290,62 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 				Lwm2mDevKit.logEvent('WARNING: TransactionHandler.handle [unknown token]');
 				
 				if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON) {
-					this.reset(message.getTID());
+					this.reset(message.getMID());
 				}
+			}
+			
+		// Empty messages
+		} else {
+			// ping
+			if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_ACK) {
+				callback = this.registeredMIDs[message.getMID()];
+				delete this.registeredMIDs[message.getMID()];
+			
+			// cancel
+			} else if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_RST) {
+				callback = this.registeredMIDs[message.getMID()];
+				delete this.registeredMIDs[message.getMID()];
 			}
 		}
 		
 		// callback might set reply for message used by deduplication
 		if (callback) {
-			callback(message);
+			try {
+				callback(message);
+			} catch (ex) {
+				ex.message = 'Message callback failed:\n' + ex.message;
+				Lwm2mDevKit.logError(ex);
+			}
 		}
 		
-		// ack all successfully received CON messages
+		// piggyback response or ack received CON messages
 		if (message.reply) {
 			this.send(message.reply);
 		} else if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON) {
-			this.ack(message.getTID());
+			this.ack(message.getMID());
 		}
 		
 		// add to duplicates filter
 		if (message.getType()!=Lwm2mDevKit.Copper.MSG_TYPE_RST) {
-			this.dupFilter.unshift(message.getTID());
-			if (message.reply) this.dupCache[message.getTID()] = message.reply;
+			this.dupFilter.unshift(message.getMID());
+			if (message.reply) this.dupCache[message.getMID()] = message.reply;
 			if (this.dupFilter.length>10) {
 				delete this.dupCache[this.dupFilter.pop()];
 			}
 		}
 	},
 	
-	ack : function(tid) {
+	ack : function(mid) {
 		var ack = new Lwm2mDevKit.CoapMessage(Lwm2mDevKit.Copper.MSG_TYPE_ACK);
-		ack.setTID( tid );
-		Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Sending ACK for message '+tid);
+		ack.setMID( mid );
+		Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Sending ACK for message '+mid);
 		this.send( ack );
 	},
 	
-	reset : function(tid) {
+	reset : function(mid) {
 		var rst = new Lwm2mDevKit.CoapMessage(Lwm2mDevKit.Copper.MSG_TYPE_RST);
-		rst.setTID( tid );
-		Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Sending RST for message '+tid);
+		rst.setMID( mid );
+		Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Sending RST for message '+mid);
 		this.send( rst );
 	},
 	

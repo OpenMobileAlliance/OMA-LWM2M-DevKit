@@ -45,7 +45,6 @@ Lwm2mDevKit.Copper.getOptionName = function(number) {
 	case Lwm2mDevKit.Copper.OPTION_CONTENT_FORMAT: return 'Content-Format';
 	case Lwm2mDevKit.Copper.OPTION_MAX_AGE: return 'Max-Age';
 	case Lwm2mDevKit.Copper.OPTION_ACCEPT: return 'Accept';
-	case Lwm2mDevKit.Copper.OPTION_TOKEN: return 'Token';
 	
 	case Lwm2mDevKit.Copper.OPTION_URI_HOST: return 'Uri-Host';
 	case Lwm2mDevKit.Copper.OPTION_URI_PORT: return 'Uri-Port';
@@ -132,7 +131,6 @@ Lwm2mDevKit.Copper.__defineGetter__("OPTION_CONTENT_FORMAT", function() { return
 Lwm2mDevKit.Copper.__defineGetter__("OPTION_MAX_AGE", function() { return 14; });
 Lwm2mDevKit.Copper.__defineGetter__("OPTION_URI_QUERY", function() { return 15; });
 Lwm2mDevKit.Copper.__defineGetter__("OPTION_ACCEPT", function() { return 17; });
-Lwm2mDevKit.Copper.__defineGetter__("OPTION_TOKEN", function() { return 19; }); // for API compatibility
 Lwm2mDevKit.Copper.__defineGetter__("OPTION_LOCATION_QUERY", function() { return 20; });
 Lwm2mDevKit.Copper.__defineGetter__("OPTION_PROXY_URI", function() { return 35; });
 Lwm2mDevKit.Copper.__defineGetter__("OPTION_PROXY_SCHEME", function() { return 39; });
@@ -233,7 +231,6 @@ Lwm2mDevKit.Copper.CoapPacket = function() {
 	this.options[Lwm2mDevKit.Copper.OPTION_LOCATION_QUERY] = new Array(0, null);
 	this.options[Lwm2mDevKit.Copper.OPTION_URI_PATH] = new Array(0, null);
 	this.options[Lwm2mDevKit.Copper.OPTION_OBSERVE] = new Array(0, null);
-	this.options[Lwm2mDevKit.Copper.OPTION_TOKEN] = new Array(0, null);
 	this.options[Lwm2mDevKit.Copper.OPTION_ACCEPT] = new Array(0, null);
 	this.options[Lwm2mDevKit.Copper.OPTION_IF_MATCH] = new Array(0, null);
 	this.options[Lwm2mDevKit.Copper.OPTION_URI_QUERY] = new Array(0, null);
@@ -243,19 +240,20 @@ Lwm2mDevKit.Copper.CoapPacket = function() {
 	this.options[Lwm2mDevKit.Copper.OPTION_SIZE1] = new Array(0, null);
 	this.options[Lwm2mDevKit.Copper.OPTION_IF_NONE_MATCH] = new Array(0, null);
 
-	this.tid = parseInt(Math.random()*0x10000);
-	
+	this.mid = -1;
+	this.token = new Array(0);
 	this.payload = new Array(0);
 	
 	return this;
 };
 
 Lwm2mDevKit.Copper.CoapPacket.prototype = {
-	version :     Lwm2mDevKit.Copper.VERSION, // member for received packets
+	version :     Lwm2mDevKit.Copper.VERSION,
 	type :        Lwm2mDevKit.Copper.MSG_TYPE_CON,
-	optionCount : 0,
+	optionCount : 0, // just informative
 	code :        Lwm2mDevKit.Copper.GET,
-	tid :         0,
+	mid :         -1,
+	token :       null,
 	options :     null,
 	payload :     null,
 	
@@ -300,6 +298,31 @@ Lwm2mDevKit.Copper.CoapPacket.prototype = {
 		} else {
 			return parseInt(this.code);
 		}
+	},
+	
+	getToken : function() {
+		// mainly used as object key, thus treat as string
+		return Lwm2mDevKit.Copper.bytes2hex(this.token);
+	},
+	
+	setToken : function(token) {
+		if (!token) {
+			token = new Array(0);
+		} else if (!Array.isArray(token)) {
+			if (token.substr(0,2)=='0x') {
+				token = Lwm2mDevKit.Copper.hex2bytes(token);
+			} else {
+				token = Lwm2mDevKit.Copper.str2bytes(token);
+			}
+		}
+		
+		while (token.length > Lwm2mDevKit.Copper.TOKEN_LENGTH) {
+			token.pop();
+			Lwm2mDevKit.logEvent('WARNING: Token must be 1-'+Lwm2mDevKit.Copper.TOKEN_LENGTH+' bytes; cutting to '+Lwm2mDevKit.Copper.TOKEN_LENGTH+' bytes]');
+		}
+		
+		delete this.token;
+		this.token = token;
 	},
 	
 	// get options that are set in the package
@@ -356,7 +379,6 @@ Lwm2mDevKit.Copper.CoapPacket.prototype = {
 			
 			// byte arrays
 			case Lwm2mDevKit.Copper.OPTION_ETAG:
-			case Lwm2mDevKit.Copper.OPTION_TOKEN:
 			case Lwm2mDevKit.Copper.OPTION_IF_MATCH:
 			default:
 				return Lwm2mDevKit.Copper.bytes2hex(opt);
@@ -382,7 +404,6 @@ Lwm2mDevKit.Copper.CoapPacket.prototype = {
 			
 			// byte arrays
 			case Lwm2mDevKit.Copper.OPTION_ETAG:
-			case Lwm2mDevKit.Copper.OPTION_TOKEN:
 			case Lwm2mDevKit.Copper.OPTION_IF_MATCH:
 				this.options[option][0] = value.length;
 				this.options[option][1] = value;
@@ -449,22 +470,22 @@ Lwm2mDevKit.Copper.CoapPacket.prototype = {
 		var byteArray = new Array();
 		var tempByte = 0x00;
 		
-	    // first byte: version, type, and option count
+	    // first byte: version, type, and token length
 		tempByte  = (0x03 & Lwm2mDevKit.Copper.VERSION) << 6; // using const for sending packets
 		tempByte |= (0x03 & this.type) << 4;
-		tempByte |= (0x0F & this.options[Lwm2mDevKit.Copper.OPTION_TOKEN][0]);
+		tempByte |= (0x0F & this.token.length);
 		
 		byteArray.push(tempByte);
 		
 		// second byte: method or response code
 	    byteArray.push(0xFF & this.code);
 	    
-	    // third and forth byte: transaction ID (TID)
-	    byteArray.push(0xFF & (this.tid >>> 8));
-	    byteArray.push(0xFF & this.tid);
+	    // third and forth byte: message ID (MID)
+	    byteArray.push(0xFF & (this.mid >>> 8));
+	    byteArray.push(0xFF & this.mid);
 	    
-	    for (let i=0; i<this.options[Lwm2mDevKit.Copper.OPTION_TOKEN][0] && i<Lwm2mDevKit.Copper.TOKEN_LENGTH; ++i) {
-	    	byteArray.push(0xFF & this.options[Lwm2mDevKit.Copper.OPTION_TOKEN][1][i]);
+	    for (let i in this.token) {
+	    	byteArray.push(0xFF & this.token[i]);
 	    }
 	    
 	    // options
@@ -472,7 +493,7 @@ Lwm2mDevKit.Copper.CoapPacket.prototype = {
 	    var optNumber = 0;
 	    for (let optTypeIt in this.options) {
 	    	
-	    	if (!Array.isArray(this.options[optTypeIt][1]) || optTypeIt==Lwm2mDevKit.Copper.OPTION_TOKEN) {
+	    	if (!Array.isArray(this.options[optTypeIt][1])) {
 				continue;
 			} else {
 				
@@ -547,7 +568,7 @@ Lwm2mDevKit.Copper.CoapPacket.prototype = {
 	parse : function(packet) {
 	
 		// first byte: version, type, and option count
-		var tempByte = packet.shift();
+		let tempByte = packet.shift();
 		
 		this.version = 0xFF & ((tempByte & 0xC0) >>> 6);
 		if (this.version != Lwm2mDevKit.Copper.VERSION) {
@@ -556,17 +577,16 @@ Lwm2mDevKit.Copper.CoapPacket.prototype = {
 
 		this.type = 0x03 & ((tempByte) >>> 4);
 
-        this.options[Lwm2mDevKit.Copper.OPTION_TOKEN][0] = 0x0F & tempByte;
-        if (this.options[Lwm2mDevKit.Copper.OPTION_TOKEN][0]>0) this.options[Lwm2mDevKit.Copper.OPTION_TOKEN][1] = new Array();
+        let tokenLength = parseInt(0x0F & tempByte);
         
         this. code = packet.shift();
 
-		// third and forth byte: transaction ID (TID)
-        this.tid  = packet.shift() << 8;
-        this.tid |= packet.shift();
+		// third and forth byte: message ID (MID)
+        this.mid  = packet.shift() << 8;
+        this.mid |= packet.shift();
 		
-		for (let i=0; i<this.options[Lwm2mDevKit.Copper.OPTION_TOKEN][0]; ++i) {
-			this.options[Lwm2mDevKit.Copper.OPTION_TOKEN][1].push(packet.shift());
+		for (let i=0; i<tokenLength; ++i) {
+			this.token.push(packet.shift());
 		}
 
         //read options
@@ -756,15 +776,13 @@ Lwm2mDevKit.Copper.hex2bytes = function(h) {
 
 Lwm2mDevKit.Copper.bytes2hex = function(b) {
 	
-	if (!b) return "empty";
+	if (!Array.isArray(b) || b.length==0) {
+		return 'empty';
+	}
 	
 	var hex = '0x';
-	if (Array.isArray(b) && b.length==0) {
-		hex += '00';
-	} else {
-		for (let k in b) {
-			hex += Lwm2mDevKit.Copper.leadingZero(b[k].toString(16).toUpperCase());
-		}
+	for (let k in b) {
+		hex += Lwm2mDevKit.Copper.leadingZero(b[k].toString(16).toUpperCase());
 	}
 	
 	return hex;

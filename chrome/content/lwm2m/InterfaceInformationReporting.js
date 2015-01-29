@@ -42,6 +42,7 @@ Lwm2mDevKit.InformationReporting.entry = function(msg) {
 
 Lwm2mDevKit.InformationReporting.entry.prototype = {
 	message : null,
+	lastMID : -1,
 	timer : null,
 	number : 1,
 	last : 0,
@@ -52,7 +53,7 @@ Lwm2mDevKit.InformationReporting.relations = { };
 
 Lwm2mDevKit.InformationReporting.handleObserve = function(message) {
 	
-	let token = message.getToken(true);
+	let token = message.getToken();
 	let path = message.getUriPath();
 	let entry = Lwm2mDevKit.InformationReporting.relations[token];
 	let operation = 'Notify';
@@ -149,10 +150,11 @@ Lwm2mDevKit.InformationReporting.notify = function(path) {
 					entry.lastValue = pl;
 				}
 				
+				entry.lastMID = Lwm2mDevKit.coapEndpoint.nextMID();
 				entry.message.reply.setType(Lwm2mDevKit.Copper.MSG_TYPE_CON);
-				entry.message.reply.setTID(null);
+				entry.message.reply.setMID(entry.lastMID);
 				entry.message.reply.setCode(Lwm2mDevKit.Copper.CODE_2_05_CONTENT);
-				Lwm2mDevKit.coapEndpoint.send(entry.message.reply);
+				Lwm2mDevKit.coapEndpoint.send(entry.message.reply, Lwm2mDevKit.observeHandler);
 				
 				let value = '';
 				if (entry.message.reply.isPrintable()) value = ": " +  entry.message.reply.getPayloadText();
@@ -169,7 +171,7 @@ Lwm2mDevKit.InformationReporting.cancel = function(cancel, message) {
 			window.clearTimeout( entry.timer );
 			
 			let rows = document.getElementById('reporting_relations');
-			rows.removeChild( document.getElementById('reporting_relation_'+cancel) );
+			rows.removeChild( document.getElementById('reporting_relation_'+token) );
 			
 			delete Lwm2mDevKit.InformationReporting.relations[token];
 			
@@ -178,7 +180,26 @@ Lwm2mDevKit.InformationReporting.cancel = function(cancel, message) {
 			return;
 		}
 	}
-	Lwm2mDevKit.logWarning("Observe relation "+cancel+" not found");
+	Lwm2mDevKit.logWarning("Observe relation for token "+cancel+" not found");
+};
+
+Lwm2mDevKit.InformationReporting.cancelByMID = function(cancel, message) {
+	for (let token in Lwm2mDevKit.InformationReporting.relations) {
+		if (Lwm2mDevKit.InformationReporting.relations[token].lastMID==cancel) {
+			let entry = Lwm2mDevKit.InformationReporting.relations[token];
+			window.clearTimeout( entry.timer );
+			
+			let rows = document.getElementById('reporting_relations');
+			rows.removeChild( document.getElementById('reporting_relation_'+token) );
+			
+			delete Lwm2mDevKit.InformationReporting.relations[token];
+			
+			Lwm2mDevKit.logOperationReporting("Cancel", entry.message.getUriPath(), "Success", message);
+			Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Cancel for '+ entry.message.getUriPath());
+			return;
+		}
+	}
+	Lwm2mDevKit.logWarning("Observe relation for MID "+cancel+" not found");
 };
 
 Lwm2mDevKit.InformationReporting.cancelManually = function(event) {
@@ -233,7 +254,7 @@ Lwm2mDevKit.InformationReporting.getAttribute = function(path, attrib) {
 Lwm2mDevKit.InformationReporting.addRelationRow = function(message) {
 
 	let rows = document.getElementById('reporting_relations');
-	let token = message.getToken(true);
+	let token = message.getToken();
 	
 	var item = document.createElement('listitem');
 	item.setAttribute('id', 'reporting_relation_'+token);

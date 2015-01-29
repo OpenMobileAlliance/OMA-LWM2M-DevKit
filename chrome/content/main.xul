@@ -201,7 +201,7 @@
 					    </listitem>
 					    <listitem>
 					        <listcell label="MID"/>
-					        <listcell id="log_server_request_header_tid"/>
+					        <listcell id="log_server_request_header_mid"/>
 					    </listitem>
 					    <listitem>
 					        <listcell label="Token"/>
@@ -249,7 +249,7 @@
 					    </listitem>
 					    <listitem>
 					        <listcell label="MID"/>
-					        <listcell id="log_client_response_header_tid"/>
+					        <listcell id="log_client_response_header_mid"/>
 					    </listitem>
 					    <listitem>
 					        <listcell label="Token"/>
@@ -334,7 +334,7 @@
 					    </listitem>
 					    <listitem>
 					        <listcell label="MID"/>
-					        <listcell id="log_notify_header_tid"/>
+					        <listcell id="log_notify_header_mid"/>
 					    </listitem>
 					    <listitem>
 					        <listcell label="Token"/>

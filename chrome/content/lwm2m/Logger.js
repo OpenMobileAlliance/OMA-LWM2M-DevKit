@@ -62,12 +62,12 @@ Lwm2mDevKit.logMessage = function(message, out) {
 	item.appendChild(cell);
 
 	cell = document.createElement('listcell');
-	cell.setAttribute('label', message.getTID() + (message.isConfirmable() ? (' (' + message.getRetries() + ')') : ''));
+	cell.setAttribute('label', message.getMID() + (message.isConfirmable() ? (' (' + message.getRetries() + ')') : ''));
 	item.appendChild(cell);
 
 	cell = document.createElement('listcell');
-	cell.setAttribute('label', message.getToken(true));
-	cell.tooltipText = message.getToken(true);
+	cell.setAttribute('label', message.getToken());
+	cell.tooltipText = message.getToken();
 	item.appendChild(cell);
 	
 	cell = document.createElement('listcell');
@@ -121,8 +121,8 @@ Lwm2mDevKit.showOperation = function(index) {
 
 	document.getElementById('log_server_request_header_type').setAttribute('label', message.getType(true));
 	document.getElementById('log_server_request_header_code').setAttribute('label', message.getCode(true));
-	document.getElementById('log_server_request_header_tid').setAttribute('label', message.getTID());
-	document.getElementById('log_server_request_header_token').setAttribute('label', message.getToken(true));
+	document.getElementById('log_server_request_header_mid').setAttribute('label', message.getMID());
+	document.getElementById('log_server_request_header_token').setAttribute('label', message.getToken());
 	
 	let optionList = document.getElementById('log_server_request_options');
 	while (optionList.getRowCount()) optionList.removeItemAt(0);
@@ -167,8 +167,8 @@ Lwm2mDevKit.showOperation = function(index) {
 
 	document.getElementById('log_client_response_header_type').setAttribute('label', message.getType(true));
 	document.getElementById('log_client_response_header_code').setAttribute('label', message.getCode(true));
-	document.getElementById('log_client_response_header_tid').setAttribute('label', message.getTID());
-	document.getElementById('log_client_response_header_token').setAttribute('label', message.getToken(true));
+	document.getElementById('log_client_response_header_mid').setAttribute('label', message.getMID());
+	document.getElementById('log_client_response_header_token').setAttribute('label', message.getToken());
 	
 	optionList = document.getElementById('log_client_response_options');
 	while (optionList.getRowCount()) optionList.removeItemAt(0);
@@ -262,8 +262,8 @@ Lwm2mDevKit.showOperationReporting = function(index) {
 
 	document.getElementById('log_notify_header_type').setAttribute('label', message.getType(true));
 	document.getElementById('log_notify_header_code').setAttribute('label', message.getCode(true));
-	document.getElementById('log_notify_header_tid').setAttribute('label', message.getTID());
-	document.getElementById('log_notify_header_token').setAttribute('label', message.getToken(true));
+	document.getElementById('log_notify_header_mid').setAttribute('label', message.getMID());
+	document.getElementById('log_notify_header_token').setAttribute('label', message.getToken());
 	
 	let optionList = document.getElementById('log_notify_options');
 	while (optionList.getRowCount()) optionList.removeItemAt(0);
