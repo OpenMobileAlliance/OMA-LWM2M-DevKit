@@ -118,6 +118,8 @@ Lwm2mDevKit.UdpClient.prototype = {
 				//showByte(byteArray[i])
 			}
 			
+			Lwm2mDevKit.logEvent('UDP: Received ' + byteArray.length + ' bytes');
+			
 			if (this.callback) this.callback(byteArray);
 			
 		} catch( ex ) {
@@ -152,6 +154,8 @@ Lwm2mDevKit.UdpClient.prototype = {
 			
 		try {
 			this.outputStream.write(datagram, datagram.length);
+
+			Lwm2mDevKit.logEvent('UDP: Sent ' + datagram.length + ' bytes');
 		} catch (ex) {
 			Lwm2mDevKit.logError(ex);
 		}

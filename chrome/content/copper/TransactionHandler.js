@@ -132,7 +132,7 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 		
 		if (this.client.ended) return;
 		
-		// set transaction ID for message
+		// set MID for message
 		if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON || message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_NON) {
 			message.setTID( this.incTID() );
 		}
@@ -149,7 +149,7 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 				// also schedule 'not responding' timeout when retransmissions are disabled 
 				timer = window.setTimeout(function(){Lwm2mDevKit.myBind(that,that.resend(message.getTID()));}, 16000); // 16 seconds
 			}
-			Lwm2mDevKit.logEvent('INFO: Storing transaction '+ message.getTID());
+			Lwm2mDevKit.logEvent('INFO: Storing MID '+ message.getTID());
 			this.transactions[message.getTID()] = new Lwm2mDevKit.Transaction(message, timer);
 		}
 		
@@ -202,13 +202,15 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 		var message = new Lwm2mDevKit.CoapMessage();
 		message.parse(datagram);
 		
+		Lwm2mDevKit.logMessage(message, false);
+		
 		if (this.transactions[message.getTID()]) {
 			// calculate round trip time
 			var ms = (new Date().getTime() - this.transactions[message.getTID()].rttStart);
 			message.getRTT = function() { return ms; };
 
 			// stop retransmission
-			Lwm2mDevKit.logEvent('INFO: Closing message ' + message.getTID() );
+			Lwm2mDevKit.logEvent('INFO: Closing MID ' + message.getTID() );
 			if (this.transactions[message.getTID()].timer) window.clearTimeout(this.transactions[message.getTID()].timer);
 			
 			// check observe cancellation
@@ -227,7 +229,7 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 					Lwm2mDevKit.logEvent('INFO: Replying to duplicate (Message ID: '+message.getTID()+')');
 					this.send(reply);
 				} else if (message.getType()==Lwm2mDevKit.Copper.MSG_TYPE_CON) {
-					Lwm2mDevKit.logEvent('INFO: Acking duplicate (Message ID: '+message.getTID()+')');
+					Lwm2mDevKit.logEvent('INFO: Acknowledging duplicate (Message ID: '+message.getTID()+')');
 					this.ack(message.getTID());
 				}
 			} else {
@@ -235,8 +237,6 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 			}
 			return;
 		}
-		
-		
 
 		// callback for message
 		var callback = null;
@@ -276,6 +276,7 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 				}
 
 				callback = this.requests[message.getToken()];
+				
 				delete this.requests[message.getToken()];
 				delete this.registeredTIDs[message.getTID()];
 			
@@ -292,8 +293,6 @@ Lwm2mDevKit.TransactionHandler.prototype = {
 				}
 			}
 		}
-		
-		Lwm2mDevKit.logMessage(message, false);
 		
 		// callback might set reply for message used by deduplication
 		if (callback) {
