@@ -151,7 +151,7 @@ Lwm2mDevKit.InformationReporting.notify = function(path) {
 				
 				entry.message.reply.setType(Lwm2mDevKit.Copper.MSG_TYPE_CON);
 				entry.message.reply.setTID(null);
-				entry.message.reply.setCode(Lwm2mDevKit.Copper.CODE_2_04_CHANGED);
+				entry.message.reply.setCode(Lwm2mDevKit.Copper.CODE_2_05_CONTENT);
 				Lwm2mDevKit.coapEndpoint.send(entry.message.reply);
 				
 				let value = '';
