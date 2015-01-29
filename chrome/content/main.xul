@@ -83,6 +83,8 @@
 		<vbox>
 			<description id="ping_info" style="width: 10em; color: #CC0000; white-space: pre-wrap;">The remote address does not respond to CoAP ping: CON-EMPTY timed out</description>
 			<separator />
+			<button class="special-button" label="CoAP Ping" oncommand="Lwm2mDevKit.ping();"/>
+			<separator />
 			<label control="local_address" value="Device Address" />
 			<textbox id="local_address" readonly="true" style="text-align: center;" />
 		</vbox>
