@@ -298,14 +298,14 @@ Lwm2mDevKit.CoapMessage.prototype = {
 	// convenience function
 	getUri : function(readable) {
 		
-		var host = this.getUriHost();
-		var port = this.getUriPort();
-		var path = this.getUriPath();
-		var query = this.getUriQuery();
+		let host = this.getUriHost();
+		let port = this.getUriPort();
+		let path = this.getUriPath();
+		let query = this.getUriQuery();
 		
-		var uri = '';
-		var decoded = 0;
-		var multiple = null;
+		let uri = '';
+		let decoded = 0;
+		let multiple = null;
 		
 		if (host) {
 			uri += 'coap://' + host;

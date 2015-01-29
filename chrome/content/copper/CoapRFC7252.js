@@ -455,7 +455,10 @@ Lwm2mDevKit.Copper.CoapPacket.prototype = {
  */
 		uri.href = inputUri;
 		
-		if (uri.hostname!='' && !uri.hostname.match(/[0-9a-f]{0,4}(:?:[0-9a-f]{0,4})+/)) {
+		if (uri.hostname!='' // set
+			&& Lwm2mDevKit.behavior.sendUriHost // enabled
+			&& !uri.hostname.match(/^[0-9]{1,3}(\.[0-9]{1,3}){3}$/) // no IPv4 literal
+			&& !uri.hostname.match(/^[0-9a-f]{0,4}(:?:[0-9a-f]{1,4})+$/i)) { // no IPv6 literal
 			this.setOption(Lwm2mDevKit.Copper.OPTION_URI_HOST, uri.hostname);
 		}
 		if (uri.pathname.length>1) {
