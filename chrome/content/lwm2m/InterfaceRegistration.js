@@ -36,9 +36,15 @@
 
 Lwm2mDevKit.Registration = { };
 
+Lwm2mDevKit.Registration.lastRegistrationHandle = null
+
 Lwm2mDevKit.Registration.register = function() {
 
 	// TODO: discover and find rt="core.rd" first
+	
+	if (!Lwm2mDevKit.client) {
+		return;
+	} 
 	
 	try {
 		let ep = Lwm2mDevKit.get('endpoint_name');
@@ -87,6 +93,7 @@ Lwm2mDevKit.Registration.onRegister = function(message) {
 		Lwm2mDevKit.Registration.scheduleUpdate();
 	} else {
 		Lwm2mDevKit.registered = false;
+		Lwm2mDevKit.Registration.lastRegistrationHandle = Lwm2mDevKit.registrationHandle; 
 		Lwm2mDevKit.registrationHandle = null;
 		Lwm2mDevKit.registrationTimestamp = null;
 		
@@ -103,10 +110,16 @@ Lwm2mDevKit.Registration.onRegister = function(message) {
 
 Lwm2mDevKit.Registration.update = function() {
 	
+	if (!Lwm2mDevKit.registrationHandle) {
+		if (!Lwm2mDevKit.Registration.lastRegistrationHandle || !confirm('Not registered!\nUpdate with last handle ('+Lwm2mDevKit.Registration.lastRegistrationHandle+')\n for testing?') ) {
+			return;
+		}
+	}
+	
 	try {
 		Lwm2mDevKit.popup(Lwm2mDevKit.hostname+':'+Lwm2mDevKit.port, 'Registration Update on '+ Lwm2mDevKit.registrationHandle);
 		
-		let uri = Lwm2mDevKit.registrationHandle;//loc value got from the handle
+		let uri = Lwm2mDevKit.registrationHandle || Lwm2mDevKit.Registration.lastRegistrationHandle;
 		let lt = Lwm2mDevKit.get('lifetime');
 		let b = Lwm2mDevKit.get('binding');
 		let sms = Lwm2mDevKit.get('sms_no');
@@ -138,11 +151,10 @@ Lwm2mDevKit.Registration.onUpdate = function(message) {
 	} else {
 		Lwm2mDevKit.registrationTimestamp = null;
 		if (!message.isSuccess()) {
+			Lwm2mDevKit.Registration.lastRegistrationHandle = Lwm2mDevKit.registrationHandle;
 			Lwm2mDevKit.registrationHandle = null;
-			Lwm2mDevKit.logWarning(new Error('Server responded with '+ message.getCode(true) + (message.getPayload().length>0 ? '\nDiagnostic message: ' + message.getPayloadText() : "")));
-		} else {
-			Lwm2mDevKit.logWarning(new Error('Server responded with '+ message.getCode(true) + (message.getPayload().length>0 ? '\nDiagnostic message: ' + message.getPayloadText() : "")));
 		}
+		Lwm2mDevKit.logWarning('Server responded with '+ message.getCode(true) + (message.getPayload().length>0 ? '\nDiagnostic message: ' + message.getPayloadText() : ""));
 	}
 	Lwm2mDevKit.set('last_update', Lwm2mDevKit.registrationTimestamp);
 	
@@ -151,12 +163,19 @@ Lwm2mDevKit.Registration.onUpdate = function(message) {
 
 Lwm2mDevKit.Registration.deregister = function() {
 	
+	if (!Lwm2mDevKit.registrationHandle) {
+		if (!Lwm2mDevKit.Registration.lastRegistrationHandle || !confirm('Not registered!\nDe-register with last handle ('+Lwm2mDevKit.Registration.lastRegistrationHandle+')\n for testing?') ) {
+			return;
+		}
+	}
+	
 	// cancel all before response, since this is what we want to do anyhow
 	Lwm2mDevKit.InformationReporting.cancelAll();
 	
+	let uri = Lwm2mDevKit.registrationHandle || Lwm2mDevKit.Registration.lastRegistrationHandle;
+	if (!uri) throw new Error('No registration handle');
+	
 	try {
-		if (!Lwm2mDevKit.registrationHandle) throw new Error('No registration handle');
-		
 		var message = new Lwm2mDevKit.CoapMessage(Lwm2mDevKit.getRequestType(), Lwm2mDevKit.Copper.DELETE, Lwm2mDevKit.registrationHandle, null);
 		
 		Lwm2mDevKit.coapEndpoint.send( message, Lwm2mDevKit.Registration.onDeregister);
@@ -169,6 +188,7 @@ Lwm2mDevKit.Registration.onDeregister = function(message) {
 
 	if (!message || message.getCode()==Lwm2mDevKit.Copper.CODE_2_02_DELETED) {
 		Lwm2mDevKit.registered = false;
+		Lwm2mDevKit.Registration.lastRegistrationHandle = Lwm2mDevKit.registrationHandle;
 		Lwm2mDevKit.registrationHandle = null;
 		Lwm2mDevKit.registrationTimestamp = null;
 		document.getElementById('handle_box').hidden = true;
@@ -176,7 +196,8 @@ Lwm2mDevKit.Registration.onDeregister = function(message) {
 		document.getElementById('update').disabled = true;
 		document.getElementById('deregister').disabled = true;
 	} else {
-		Lwm2mDevKit.logWarning(new Error('Server responded with '+ message.getCode(true) + message.getPayload().length>0 ? '\nDiagnostic message: ' + message.getPayloadText() : ""));
+		Lwm2mDevKit.Registration.lastRegistrationHandle = Lwm2mDevKit.registrationHandle;
+		Lwm2mDevKit.logWarning('Server responded with '+ message.getCode(true) + (message.getPayload().length>0 ? '\nDiagnostic message: ' + message.getPayloadText() : ""));
 	}
 	
 	if (Lwm2mDevKit.Registration.scheduleTimer!=null) {
