@@ -1,6 +1,6 @@
 {
 	"endpointClientName": "DEVKIT",
-	"lifetime": "300",
+	"lifetime": "60",
 	"version": "1.0",
 	"bindingMode": "U",
 	"smsNo": "",
