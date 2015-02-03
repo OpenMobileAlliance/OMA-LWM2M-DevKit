@@ -66,7 +66,7 @@
 	
 	<keyset>
 		<key key="h" oncommand="Lwm2mDevKit.Tooltips.help();" />
-		<key key="e" oncommand="Lwm2mDevKit.loadDefaultLWM2MDevice();" />
+		<key key="e" oncommand="Lwm2mDevKit.loadExampleClient();" />
 		<key key="c" oncommand="Lwm2mDevKit.enableCreateRows();" />
 		<key key="r" oncommand="Lwm2mDevKit.Registration.register();" />
 		<key key="u" oncommand="Lwm2mDevKit.Registration.update();" />
@@ -94,7 +94,7 @@
 		<vbox>
 			<button id="example_client" class="special-button" label="Example Client"
 				accesskey="E"
-				oncommand="Lwm2mDevKit.loadDefaultLWM2MDevice(); document.getElementById('panel_device_loading').hidePopup();" />
+				oncommand="Lwm2mDevKit.loadExampleClient(); document.getElementById('panel_device_loading').hidePopup();" />
 			<separator />
 			<button id="load_from_file" class="special-button" label="New Client"
 				accesskey="N"

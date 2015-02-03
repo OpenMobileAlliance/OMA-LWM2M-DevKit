@@ -42,74 +42,69 @@ Lwm2mDevKit.Tooltips.finish = false;
 Lwm2mDevKit.Tooltips.steps = [
   	{
 		"tool": "button_load_device",
-		"tip": "Press 'H' to \n load the next tooltip or disable tooltips in the <html:b>preferences</html:b> (upper right \n corner).",
-		"action": "this.hidePopup(); Lwm2mDevKit.Tooltips.nextStep();",
+		"tip": "Press <html:tt>H</html:tt> to \n load the next tooltip or disable tooltips in the <html:b>preferences</html:b> (upper right \n corner).",
+		"action": function() { this.hidePopup(); Lwm2mDevKit.Tooltips.nextStep(); },
 		"offsetx": 180
 	},
 	{ // 1
 		"tool": "button_load_device",
-		"tip": "First \n load a virtual <html:b>LWM2M Client</html:b>. \n Press 'E' to directly load the Example Client.",
-		"action": "document.getElementById('example_client').click();"
+		"tip": "First \n load a virtual <html:b>LWM2M Client</html:b>. \n Press <html:tt>E</html:tt> to directly load the Example Client.",
+		"action": function() { document.getElementById('example_client').click(); }
 	},
 	{ // 2
 		"tool": "tree_device",
 		"tip": "This tree \n shows the available \n <html:b>Objects</html:b> and \n <html:b>Object Instances</html:b>. Browse them.",
-		"action": "Lwm2mDevKit.Tooltips.clickThrough(event);Lwm2mDevKit.Tooltips.clickThrough(event);"
+		"action": function(event) { Lwm2mDevKit.Tooltips.clickThrough(event); }
 	},
 	{ // 3
 		"tool": "button_registration",
-		"tip": "Add the \n 'Timezone' Resource under <html:b>Device (3) / 0</html:b>. \n 'C' toggles the rows to create Resources and Instances.",
-		"action": null,
+		"tip": "Add the \n 'Timezone' Resource under <html:b>Device (3) / 0</html:b>. \n <html:tt>C</html:tt> toggles the rows to create Resources and Instances.",
 		"offsety": 10,
 		"offsety": 90
 	},
 	{ // 4
 		"tool": "button_preferences",
 		"tip": "Add an \n <html:b>Instance with ID 2</html:b> \n to the \n <html:b>LWM2M Server</html:b> Object (1).",
-		"action": "",
 		"offsetx": -445,
 		"offsety": 68
 	},
 	{ // 5
 		"tool": "button_registration",
 		"tip": "Open the \n <html:b>Registration Interface</html:b> to register with the LWM2M Server.",
-		"action": "this.hidePopup();document.getElementById('button_registration').click();"
+		"action": function() { this.hidePopup(); document.getElementById('button_registration').click(); }
 	},
 	{ // 6
 		"tool": "endpoint_name",
-		"tip": "Parameters \n sent on registration: the <html:b>Endpoint Client Name</html:b> is mandatory. Press 'Register' or \n hotkey 'R'.",
-		"action": null
+		"tip": "Parameters \n sent on registration: the <html:b>Endpoint Client Name</html:b> is mandatory. Press 'Register' or \n hotkey <html:tt>R</html:tt>.",
+		"action": function() { this.hidePopup(); }
 	},
 	{ // 7
 		"tool": "button_service",
 		"tip": "The Client is registered. Check \n the <html:b>LWM2M Server</html:b>, \n then click 'Device \n Management &amp; \n Service En.'",
-		"action": "document.getElementById('panel_registration').hidePopup(); document.getElementById('button_service').click();"
+		"action": function() { document.getElementById('panel_registration').hidePopup(); document.getElementById('button_service').click(); }
 	},
 	{ // 8
 		"tool": "log_operations",
-		"tip": "Requests from \n the <html:b>LWM2M Server</html:b> are logged here. Use it to perform Read, Write, and Execute operations.",
-		"action": null
+		"tip": "Requests from \n the <html:b>LWM2M Server</html:b> are logged here. Use it to perform Read, Write, and Execute operations."
 	},
 	{ // 9
 		"tool": "button_service",
 		"tip": "Open the \n <html:b>Device Management \n &amp; \n Service Enablement</html:b> interface.",
-		"action": "document.getElementById('button_service').click();"
+		"action": function() { document.getElementById('button_service').click(); }
 	},
 	{ // 10
 		"tool": "log_server_request_options",
 		"tip": "Click on one \n of the operations to see the details of the CoAP messages.",
-		"action": null,
 		"offsety": -100
 	},
 	{ // 11
 		"tool": "button_reporting",
 		"tip": "The 'Information Reporting' interface shows all active <html:b>Observe</html:b> operations. Open it.",
-		"action": "document.getElementById('panel_service').hidePopup(); document.getElementById('button_reporting').click();"
+		"action": function() { document.getElementById('panel_service').hidePopup(); document.getElementById('button_reporting').click(); }
 	},
 	{ // 12
 		"tool": "log_operations_reporting",
-		"tip": "<html:b>Observe</html:b> and \n <html:b>Notify</html:b> operations \n are logged here. \n Observe a Resource from the LWM2M Server.",
-		"action": null
+		"tip": "<html:b>Observe</html:b> and \n <html:b>Notify</html:b> operations \n are logged here. \n Observe a Resource from the LWM2M Server."
 	},
 	{ // 13
 		"tool": "log_operations_reporting",
@@ -118,8 +113,7 @@ Lwm2mDevKit.Tooltips.steps = [
 	},
 	{ // 14
 		"tool": "tree_device",
-		"tip": "Select the \n Object Instance of the Resource the LWM2M Server is observing.",
-		"action": null
+		"tip": "Select the \n Object Instance of the Resource the LWM2M Server is observing."
 	},
 	{ // 15
 		"tool": "value_resource_notify",
@@ -129,30 +123,38 @@ Lwm2mDevKit.Tooltips.steps = [
 	//"Lwm2mDevKit.Tooltips.show(Lwm2mDevKit.Tooltips.steps.length-1);"
 	{ // end
 		"tool": "button_load_device",
-		"tip": "Done! \n Click me to \n disable tooltips. \n Use the preferences or hotkey 'H' to change this.",
-		"action": "Lwm2mDevKit.Tooltips.enabled = false; Lwm2mDevKit.prefManager.setBoolPref('extensions.lwm2m-devkit.show-tooltips', false);",
+		"tip": "Done! \n Click me to \n disable tooltips. \n Use the preferences or hotkey <html:tt>H</html:tt> to change this.",
+		"action": function() { Lwm2mDevKit.Tooltips.enabled = false; Lwm2mDevKit.prefManager.setBoolPref('extensions.lwm2m-devkit.show-tooltips', false); this.hidePopup(); },
 		"offsetx": 180
 	}
 ];
 
 Lwm2mDevKit.Tooltips.clickThrough = function(event) {
-	document.getElementById('tooltip').style.display = 'none';
+	document.getElementById('tooltip').hidePopup();
 	let under = document.elementFromPoint(event.clientX, event.clientY); 
 	if (under.id=='tree_children') Lwm2mDevKit.onTreeClicked(event);
-	else under.click(event);
-	document.getElementById('tooltip').style.display = '';
+	//else under.click(event);
 };
 
 Lwm2mDevKit.Tooltips.show = function(step) {
+	
+	try {
 	
 	let tip = document.getElementById('tooltip');
 	let text = document.getElementById('tooltiptext');
 	let tool = document.getElementById(Lwm2mDevKit.Tooltips.steps[step]['tool']);
 	
-	text.textContent = Lwm2mDevKit.Tooltips.steps[step]['tip'];
-	tip.addEventListener('click', Lwm2mDevKit.Tooltips.steps[step]['action']);
+	// innerHTML because the should be HTML formatting -- alternative for textContent?
+	text.innerHTML = Lwm2mDevKit.Tooltips.steps[step]['tip'];
 	
-	if (step==8) tip.removeEventListener('click', Lwm2mDevKit.Tooltips.clickThrough);
+	// remove the old event listeners
+	let newTip = tip.cloneNode(true);
+	tip.parentNode.replaceChild(newTip, tip);
+	tip = newTip;
+	
+	if (Lwm2mDevKit.Tooltips.steps[step]['action']) {
+		tip.addEventListener('click', Lwm2mDevKit.Tooltips.steps[step]['action']);
+	}
 	
 	let x = 60;
 	let y = -30;
@@ -161,6 +163,10 @@ Lwm2mDevKit.Tooltips.show = function(step) {
 	if (Lwm2mDevKit.Tooltips.steps[step]['offsety']) y += Lwm2mDevKit.Tooltips.steps[step]['offsety'];
 	
 	tip.openPopup(tool, 'overlap', x, y, false, true, null);
+	
+	} catch (ex) {
+		Lwm2mDevKit.logError(ex);
+	}
 };
 
 Lwm2mDevKit.Tooltips.nextStep = function() {
@@ -203,6 +209,8 @@ Lwm2mDevKit.Tooltips.nextStep = function() {
 	} else if (Lwm2mDevKit.Tooltips.finish) {
 		step = Lwm2mDevKit.Tooltips.steps.length - 1;
 	}
+	
+	Lwm2mDevKit.logEvent('Tooltip '+step);
 	
 	// delay execution to ensure tooltip on top of other panels
 	if (step >= 0) window.setTimeout(

@@ -86,7 +86,7 @@ separator {
 }
 
 #interface_buttons .special-button {
-   margin: 10px;
+	margin: 10px;
 }
 
 textbox.resvalue {
@@ -95,8 +95,18 @@ textbox.resvalue {
 	background-color: rgb(200, 235, 245);
 }
 
+tt {
+	color: black;
+	font-weight: bold;
+	background-color: silver;
+	padding: 0px 3px 0px 3px;
+	border: 1px solid darkgray;
+	border-radius: 5px;
+	
+}
+
 listcell label {
-white-space: pre-wrap;
+	white-space: pre-wrap;
 }
 
 /* removes lines next to checkboxes (border of empty labels) */
