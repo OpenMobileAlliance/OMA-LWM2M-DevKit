@@ -38,8 +38,14 @@
 Lwm2mDevKit.objectDefinitions = null;
 Lwm2mDevKit.client = null;
 
-Lwm2mDevKit.loadDefaultLWM2MDevice = function() {
-
+Lwm2mDevKit.loadExampleClient = function() {
+	
+	if (Lwm2mDevKit.client!=null && !confirm('There is already a client loaded.\nContinue and reload the resource data?')) {
+		return;
+	}
+	
+	Lwm2mDevKit.logEvent('Loading the Example Client');
+	
 	Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
 	let objectDefinitionsFile = "resource://objects/lwm2m-object-definitions.json";
@@ -47,7 +53,7 @@ Lwm2mDevKit.loadDefaultLWM2MDevice = function() {
 	
 	NetUtil.asyncFetch(objectDefinitionsFile, function(inputStream, status) {
 		if (!Components.isSuccessCode(status)) {
-			Lwm2mDevKit.logError(new Error("Object definitions could not be loaded [loadDefaultLWM2MDevice]"));
+			Lwm2mDevKit.logError(new Error("Object definitions could not be loaded"));
 			return;
 		}
 
@@ -63,7 +69,7 @@ Lwm2mDevKit.loadDefaultLWM2MDevice = function() {
 	NetUtil.asyncFetch(clientFile, function(inputStream, status) {
 		if (!Components.isSuccessCode(status)) {
 			// Handle error!
-			Lwm2mDevKit.logError(new Error("Virtual client could not be loaded [loadDefaultLWM2MDevice]"));
+			Lwm2mDevKit.logError(new Error("Virtual client could not be loaded"));
 			return;
 		}
 
