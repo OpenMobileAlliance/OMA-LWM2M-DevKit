@@ -87,6 +87,16 @@ Lwm2mDevKit.saveBehavior = function() {
 			Lwm2mDevKit.behavior.observeCancellation);
 };
 
+Lwm2mDevKit.htmlParser = function(aHTMLString) {
+	let div = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+	
+	div.appendChild(Components.classes["@mozilla.org/parserutils;1"]
+		.getService(Components.interfaces.nsIParserUtils)
+		.parseFragment(aHTMLString, null, false, null, div));
+
+	return div;
+};
+
 Lwm2mDevKit.parseUri = function(inputUri) {
 
 	/*

@@ -95,6 +95,13 @@ textbox.resvalue {
 	background-color: rgb(200, 235, 245);
 }
 
+#tooltiptext div {
+	text-align: center;
+	margin: 5px;
+	white-space: pre-wrap;
+	cursor: inherit;
+}
+
 tt {
 	color: black;
 	font-weight: bold;
