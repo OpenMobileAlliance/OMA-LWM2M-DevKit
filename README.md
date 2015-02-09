@@ -10,7 +10,7 @@ This way, developers and users can interactively explore and comprehend the new 
 ## Features
 -  OMA Lightweight M2M 1.0
 -  Virtual LWM2M Clients
--  7 OMA-label Objects with descriptions
+-  8 OMA-label Objects with descriptions
 -  Object Instance and Resource editing
 -  Registration Interface
 -  Device Management and Service Enablement Interface
