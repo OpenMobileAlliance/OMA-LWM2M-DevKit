@@ -4,7 +4,7 @@
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>lwm2m-devkit@openmobilealliance.org</em:id>
 		<em:name>OMA LWM2M DevKit</em:name>
-		<em:version>0.5.2-SNAPSHOT</em:version>
+		<em:version>0.5.2</em:version>
 		<em:type>2</em:type>
 		<em:creator>Matthias Kovatsch, ETH Zurich</em:creator>
 		<em:description>OMA Lightweight M2M protocol tool: The OMA LWM2M DevKit is an interactive LWM2M Client that sends live messages to interact with LWM2M Server implementations.</em:description>
