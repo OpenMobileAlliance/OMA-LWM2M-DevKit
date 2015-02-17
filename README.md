@@ -50,8 +50,8 @@ The developer version uses a cloned Git repository to directly inject the source
 1. If the LWM2M Server responds to CoAP ping, this button turn green. When clicking on it, the LWM2M Client address is shown.
 2. All CoAP messages are logged here. The first entries show the CoAP ping exchange (CON-EMPTY/RST-EMPTY).
 3. This button opens a menu to load the the virtual LWM2M Client. Once the DevKit is aligned with the LabKit, it will allow the creation of custom LWM2M Clients and Objects. Use the hotkey `E` to directly load the Example Client.
-4. This area will show the Objects provided by the LWM2M Client. Currently, the seven OMA-label Objects are supported.
-5. This area will either show the Object definitions when selecting an Object at (3) or the Resources when selecting an Instance at (3).
+4. This area will show the Objects provided by the LWM2M Client. Currently, the eight OMA-label Objects are supported.
+5. This area will either show the Object definitions when selecting an Object at (4) or the Resources when selecting an Instance at (4).
 6. The Bootstrap Interface is always disabled. The address of the LWM2M Server is entered by the user, which logically corresponds to a factory bootstrap.
 7. The Register Interface allows to register, update, and de-register the Client. The menu also takes input for the registration parameters. The hotkey `R`directly registers the client one it was loaded.
 8. The Device Management & Service Enablement Interface menu provides a log of all operations executed by the LWM2M Server. When selecting a log entry, the corresponding CoAP messages are shown.
