@@ -197,7 +197,7 @@
         "operations": "E",
         "instancetype": "single",
         "mandatory": false,
-        "type": "string",
+        "type": "",
         "range": "",
         "units": "",
         "description": "If this Resource is executed, this LWM2M Server Object is disabled for a certain period defined in the Disabled Timeout Resource. After receiving “Execute” operation, LWM2M Client MUST send response of the operation and perform de-registration process, and underlying network connection between the Client and Server MUST be disconnected to disable the LWM2M Server account.\nAfter the above process, the LWM2M Client MUST NOT send any message to the Server and ignore all the messages from the LWM2M Server for the period."
@@ -241,7 +241,7 @@
         "operations": "E",
         "instancetype": "single",
         "mandatory": true,
-        "type": "string",
+        "type": "",
         "range": "",
         "units": "",
         "description": "If this Resource is executed the LWM2M Client MUST perform an “Update” operation with this LWM2M Server using the Current Transport Binding and Mode."
@@ -358,7 +358,7 @@
         "operations": "E",
         "instancetype": "single",
         "mandatory": true,
-        "type": "string",
+        "type": "",
         "range": "",
         "units": "",
         "description": "Reboot the LWM2M Device to restore the Device from unexpected firmware failure."
@@ -369,7 +369,7 @@
         "operations": "E",
         "instancetype": "single",
         "mandatory": false,
-        "type": "string",
+        "type": "",
         "range": "",
         "units": "",
         "description": "Perform factory reset of the LWM2M Device to make the LWM2M Device have the same configuration as at the initial deployment.\nWhen this Resource is executed, “De-register” operation  MAY be sent to the LWM2M Server(s) before factory reset of the LWM2M Device."
@@ -446,7 +446,7 @@
         "operations": "E",
         "instancetype": "single",
         "mandatory": false,
-        "type": "string",
+        "type": "",
         "range": "",
         "units": "",
         "description": "Delete all error code Resource Instances and create only one zero-value error code that implies no error."
@@ -662,7 +662,7 @@
         "operations": "E",
         "instancetype": "single",
         "mandatory": true,
-        "type": "string",
+        "type": "",
         "range": "",
         "units": "",
         "description": "Updates firmware by using the firmware package stored in Package, or, by using the firmware downloaded from the Package URI.\nThis Resource is only executable when the value of the State Resource is Downloaded."
@@ -856,7 +856,7 @@
         "operations": "E",
         "instancetype": "single",
         "mandatory": true,
-        "type": "string",
+        "type": "",
         "range": "",
         "units": "",
         "description": "Start to collect information or reset all other Resources to zeros in this Object. For example, the first time this Resource is executed, the client starts to collect information. The second time this Resource is executed, the values of Resource 0~5 are reset to 0."

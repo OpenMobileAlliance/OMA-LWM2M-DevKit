@@ -762,6 +762,14 @@ Lwm2mDevKit.createInstance = function(obj, ins, data) {
 		Lwm2mDevKit.client.instances[obj][ins] = data;
 	} else {
 		Lwm2mDevKit.client.instances[obj][ins] = new Object();
+		
+		// create mandatory resources
+		let defs = Lwm2mDevKit.objectDefinitions[obj].resourcedefs;
+		for (let r in defs) {
+			if (defs[r].mandatory) {
+				Lwm2mDevKit.client.instances[obj][ins][r] = Lwm2mDevKit.createData(defs[r].type);
+			}
+		}
 	}
 	
 	// update tree
@@ -770,6 +778,21 @@ Lwm2mDevKit.createInstance = function(obj, ins, data) {
 	
 	Lwm2mDevKit.Tooltips.nextStep();
 	return true;
+};
+
+Lwm2mDevKit.createData = function(type) {
+	switch (type) {
+	case "integer":
+	case "float":
+	case "time":
+		return Number(0);
+	case "boolean":
+		return Boolean(false);
+	case "string":
+	case "opaque":
+	default:
+		return String("");
+	}
 };
 
 Lwm2mDevKit.deleteInstance = function(obj, ins) {
