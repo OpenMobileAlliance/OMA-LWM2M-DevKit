@@ -862,5 +862,243 @@
         "description": "Start to collect information or reset all other Resources to zeros in this Object. For example, the first time this Resource is executed, the client starts to collect information. The second time this Resource is executed, the values of Resource 0~5 are reset to 0."
       }
     }
+  },
+  "8": {
+    "id": 8,
+    "name": "Lock and Wipe",
+    "instancetype": "single",
+    "mandatory": false,
+    "description": "This LWM2M objects provides the resources needed to perform the lock and wipe operations.",
+    "resourcedefs": {
+			"0": {
+        "id": 0,
+        "name": "State",
+        "operations": "RW",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "integer",
+        "range": "0-2",
+        "units": "",
+        "description": "State of the device:\n0: unlocked state\nNormal operation.\n1: partially locked state\nTo render the device inoperable the device has been partially locked. The “lock target” resource allows specifying the target(s) for this operation.\n2: fully locked state\nTo render the device fully inoperable the device has been fully locked."
+			},
+			"1": {
+        "id": 1,
+        "name": "Lock target",
+        "operations": "W",
+        "instancetype": "multiple",
+        "mandatory": true,
+        "type": "string",
+        "range": "",
+        "units": "",
+        "description": "To specify one or several targets for the lock operation. This allows partially locking the device by selecting specific components or interfaces to be locked."
+			},
+			"2": {
+        "id": 2,
+        "name": "Wipe item",
+        "operations": "R",
+        "instancetype": "multiple",
+        "mandatory": false,
+        "type": "string",
+        "range": "",
+        "units": "",
+        "description": "Indicates which data can be wiped from the device. This resource could be e.g. representing a directory."
+			},
+			"3": {
+        "id": 3,
+        "name": "Wipe",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "",
+        "range": "",
+        "units": "",
+        "description": "To permanently erase data from the device."
+			},
+			"4": {
+        "id": 4,
+        "name": "Wipe target",
+        "operations": "W",
+        "instancetype": "multiple",
+        "mandatory": true,
+        "type": "string",
+        "range": "",
+        "units": "",
+        "description": "To specify one or several targets for the wipe operation. This allows selecting specific data, or, memory areas for the wipe operation."
+			},
+			"5": {
+        "id": 5,
+        "name": "Lock or Wipe Operation Result",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "integer",
+        "range": "0-8",
+        "units": "",
+        "description": "Contains the result of a lock and wipe operation\n0: Default\n1: Partially Lock operation successful\n2: Fully Lock operation successful\n3: Unlock operation successful\n4: Wipe operation successful\n5: Partially Lock operation failed\n6: Fully Lock operation failed\n7: Unlock operation failed\n8: Wipe operation failed\nThis Resource MAY be reported by sending Observe operation."
+			}
+		}
+  },
+  "9": {
+    "id": 9,
+    "name": "Software Update",
+    "instancetype": "multiple",
+    "mandatory": false,
+    "description": "This LWM2M Objects provides the resources needed to perform software management on the device. Each software component is managed via a dedicated Software Management Object instance.",
+    "resourcedefs": {
+      "0": {
+        "id": 0,
+        "name": "PkgName",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "string",
+        "range": "0-255 bytes",
+        "units": "",
+        "description": "Name of the software package."
+      },
+      "1": {
+        "id": 1,
+        "name": "PkgVersion",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "string",
+        "range": "0-255 bytes",
+        "units": "",
+        "description": "Version of the software package."
+      },
+      "2": {
+        "id": 2,
+        "name": "Package",
+        "operations": "W",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "opaque",
+        "range": "",
+        "units": "",
+        "description": "Software package."
+      },
+      "3": {
+        "id": 3,
+        "name": "Package URI",
+        "operations": "W",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "string",
+        "range": "0-255 bytes",
+        "units": "",
+        "description": "URI from where the device can download the software package by an alternative mechanism. As soon as the device has received the Package URI it performs the download at the next practical opportunity."
+      },
+      "4": {
+        "id": 4,
+        "name": "Install",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "",
+        "range": "",
+        "units": "",
+        "description": "Installs software from the package either stored in Package resource or downloaded from the Package URI. This Resource is only executable when the value of the State Resource is DELIVERED."
+      },
+      "5": {
+        "id": 5,
+        "name": "Checkpoint",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "objlnk",
+        "range": "",
+        "units": "",
+        "description": "Link to a 'Checkpoint' object which allows to specify conditions/dependencies for a software update. E.g. power connected, sufficient memory, target system."
+      },
+      "6": {
+        "id": 6,
+        "name": "Uninstall",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "",
+        "range": "",
+        "units": "",
+        "description": "Uninstalls the software package, removes it from the Device if present and set Update State back to INITIAL state."
+      },
+      "7": {
+        "id": 7,
+        "name": "Update State",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "integer",
+        "range": "1-5",
+        "units": "",
+        "description": "Indicates current state with respect to this software update. This value is set by the LWM2M Client.\n1: INITIAL Before downloading. (see 5.1.2.1)\n2: DOWNLOAD STARTED The downloading process has started and is on-going. (see 5.1.2.2)\n3: DOWNLOADED The package has been completely downloaded (see 5.1.2.3)\n4: DELIVERED In that state, the package has been correctly downloaded and is ready to be installed. (see 5.1.2.4)\nIf executing the Install Resource failed, the state remains at DELIBERED.\nIf executing the Install Resource was successful, the state changes from DELIVERED to INSTALLED.\nAfter executing the UnInstall Resource, the state changes to INITIAL.\n5: INSTALLED In that state the software is correctly installed and can be activated or deactivated according to the Activation State Machine. (see 5.1.2.5)"
+      },
+      "8": {
+        "id": 8,
+        "name": "Update Supported Objects",
+        "operations": "RW",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": "If this value is true, the LWM2M Client MUST inform the registered LWM2M Servers of Objects and Object Instances parameter by sending an Update or Registration message after the software update operation at the next practical opportunity if supported Objects in the LWM2M Client have changed, in order for the LWM2M Servers to promptly manage newly installed Objects.\nIf false, Objects and Object Instances parameter MUST be reported at the next periodic Update message.\nThe default value is false."
+      },
+      "9": {
+        "id": 9,
+        "name": "Update Result",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "integer",
+        "range": "0-10",
+        "units": "",
+        "description": "Contains the result of downloading or installing/uninstalling the software\n0: Initial value. Prior to download any new package in the Device, Update Result MUST be reset to this initial value. One side effect of executing the Uninstall resource is to reset Update Result to this initial value '0'.\n1: Downloading. The package downloading process is on-going.\n2: Software d successfully installed.\n3: Not enough storage for the new software package.\n4: Out of memory during downloading process.\n5: Connection lost during downloading process.\n6: Package integrity check failure.\n7: Unsupported package type.\n8: Invalid URI\n9: Device defined update error\n10: Software installation failure\nThis Resource MAY be reported by sending Observe operation."
+      },
+      "10": {
+        "id": 10,
+        "name": "Activate",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "",
+        "range": "",
+        "units": "",
+        "description": "This action activates the software previously successfully installed (the Package Installation State Machine is currently in the INSTALLED state)"
+      },
+      "11": {
+        "id": 11,
+        "name": "Deactivate",
+        "operations": "E",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "",
+        "range": "",
+        "units": "",
+        "description": "This action deactivates software if the Package Installation State Machine is currently in the INSTALLED state."
+      },
+      "12": {
+        "id": 12,
+        "name": "Activation State",
+        "operations": "R",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "boolean",
+        "range": "",
+        "units": "",
+        "description": "Indicates the current activation state of this software:\n0: DISABLED Activation State is DISABLED if the Software Activation State Machine is in the INACTIVE state or not alive.\n1: ENABLED Activation State is ENABLED only if the Software Activation State Machine is in the ACTIVE state"
+      },
+      "13": {
+        "id": 13,
+        "name": "Package Settings",
+        "operations": "RW",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "objlnk",
+        "range": "",
+        "units": "",
+        "description": "Link to “Package Settings” object which allows to modify at any time software configuration settings. This is an application specific object.\nNote: OMA might provide a template for a Package Settings object in a future release of this specification."
+      }
+    }
   }
 }
