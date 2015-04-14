@@ -48,7 +48,7 @@
         "type": "opaque",
         "range": "",
         "units": "",
-        "description": "Stores the LWM2M Client’s Certificate (Certificate mode), public key (RPK mode) or PSK Identity (PSK mode). The format is defined in Section E.1.1."
+        "description": "Stores the LWM2M Client's Certificate (Certificate mode), public key (RPK mode) or PSK Identity (PSK mode). The format is defined in Section E.1.1."
       },
       "4": {
         "id": 4,
@@ -59,7 +59,7 @@
         "type": "opaque",
         "range": "",
         "units": "",
-        "description": "Stores the LWM2M Server’s or LWM2M Bootstrap Server’s Certificate (Certificate mode), public key (RPK mode) or PSK Identity (PSK mode). The format is defined in Section E.1.1."
+        "description": "Stores the LWM2M Server's or LWM2M Bootstrap Server's Certificate (Certificate mode), public key (RPK mode) or PSK Identity (PSK mode). The format is defined in Section E.1.1."
       },
       "5": {
         "id": 5,
@@ -178,7 +178,7 @@
         "type": "integer",
         "range": "",
         "units": "s",
-        "description": "The default value the LWM2M Client should use for the Minimum Period of an Observation in the absence of this parameter being included in an Observation.\nIf this Resource doesn’t exist, the default value is 1."
+        "description": "The default value the LWM2M Client should use for the Minimum Period of an Observation in the absence of this parameter being included in an Observation.\nIf this Resource doesn't exist, the default value is 1."
       },
       "3": {
         "id": 3,
@@ -200,7 +200,7 @@
         "type": "",
         "range": "",
         "units": "",
-        "description": "If this Resource is executed, this LWM2M Server Object is disabled for a certain period defined in the Disabled Timeout Resource. After receiving “Execute” operation, LWM2M Client MUST send response of the operation and perform de-registration process, and underlying network connection between the Client and Server MUST be disconnected to disable the LWM2M Server account.\nAfter the above process, the LWM2M Client MUST NOT send any message to the Server and ignore all the messages from the LWM2M Server for the period."
+        "description": "If this Resource is executed, this LWM2M Server Object is disabled for a certain period defined in the Disabled Timeout Resource. After receiving 'Execute' operation, LWM2M Client MUST send response of the operation and perform de-registration process, and underlying network connection between the Client and Server MUST be disconnected to disable the LWM2M Server account.\nAfter the above process, the LWM2M Client MUST NOT send any message to the Server and ignore all the messages from the LWM2M Server for the period."
       },
       "5": {
         "id": 5,
@@ -222,7 +222,7 @@
         "type": "boolean",
         "range": "",
         "units": "",
-        "description": "If true, the LWM2M Client stores “Notify” operations to the LWM2M Server while the LWM2M Server account is disabled or the LWM2M Client is offline. After the LWM2M Server account is enabled or the LWM2M Client is online, the LWM2M Client reports the stored “Notify” operations to the Server.\nIf false, the LWM2M Client discards all the “Notify” operationsor temporally disables the Observe function while the LWM2M Server is disabled or the LWM2M Client is offline.\nThe default value is true.\nThe maximum number of storing Notification per the Server is up to the implementation."
+        "description": "If true, the LWM2M Client stores 'Notify' operations to the LWM2M Server while the LWM2M Server account is disabled or the LWM2M Client is offline. After the LWM2M Server account is enabled or the LWM2M Client is online, the LWM2M Client reports the stored 'Notify' operations to the Server.\nIf false, the LWM2M Client discards all the 'Notify' operationsor temporally disables the Observe function while the LWM2M Server is disabled or the LWM2M Client is offline.\nThe default value is true.\nThe maximum number of storing Notification per the Server is up to the implementation."
       },
       "7": {
         "id": 7,
@@ -244,7 +244,7 @@
         "type": "",
         "range": "",
         "units": "",
-        "description": "If this Resource is executed the LWM2M Client MUST perform an “Update” operation with this LWM2M Server using the Current Transport Binding and Mode."
+        "description": "If this Resource is executed the LWM2M Client MUST perform an 'Update' operation with this LWM2M Server using the Current Transport Binding and Mode."
       }
     }
   },
@@ -297,7 +297,7 @@
         "type": "integer",
         "range": "0-65535",
         "units": "",
-        "description": "Short Server ID of a certain LWM2M Server. Only this LWM2M Server can manage these Resources of the Object Instance.\nValue MAX_ID\u003d65535 is reserved for the Access Control Object Instances created during Bootstrap procedure."
+        "description": "Short Server ID of a certain LWM2M Server. Only this LWM2M Server can manage these Resources of the Object Instance.\nValue MAX_ID=65535 is reserved for the Access Control Object Instances created during Bootstrap procedure."
       }
     }
   },
@@ -372,7 +372,7 @@
         "type": "",
         "range": "",
         "units": "",
-        "description": "Perform factory reset of the LWM2M Device to make the LWM2M Device have the same configuration as at the initial deployment.\nWhen this Resource is executed, “De-register” operation  MAY be sent to the LWM2M Server(s) before factory reset of the LWM2M Device."
+        "description": "Perform factory reset of the LWM2M Device to make the LWM2M Device have the same configuration as at the initial deployment.\nWhen this Resource is executed, 'De-register' operation  MAY be sent to the LWM2M Server(s) before factory reset of the LWM2M Device."
       },
       "6": {
         "id": 6,
@@ -383,7 +383,7 @@
         "type": "integer",
         "range": "0-7",
         "units": "",
-        "description": "0 – DC power\n1 – Internal Battery\n2 – External Battery\n4 – Power over Ethernet\n5 – USB\n6 – AC (Mains) power\n7 – Solar"
+        "description": "0: DC power\n1: Internal Battery\n2: External Battery\n4: Power over Ethernet\n5: USB\n6: AC (Mains) power\n7: Solar"
       },
       "7": {
         "id": 7,
@@ -438,7 +438,7 @@
         "type": "integer",
         "range": "",
         "units": "",
-        "description": "0\u003dNo error\n1\u003dLow battery power\n2\u003dExternal power supply off\n3\u003dGPS module failure\n4\u003dLow received signal strength\n5\u003dOut of memory\n6\u003dSMS failure\n7\u003dIP connectivity failure\n8\u003dPeripheral malfunction\n\nWhen the single Device Object Instance is initiated, there is only one error code Resource Instance whose value is equal to 0 that means no error. When the first error happens, the LWM2M Client changes error code Resource Instance to any non-zero value to indicate the error type. When any other error happens, a new error code Resource Instance is created.\nThis error code Resource MAY be observed by the LWM2M Server. How to deal with LWM2M Client’s error report depends on the policy of the LWM2M Server."
+        "description": "0: No error\n1: Low battery power\n2: External power supply off\n3: GPS module failure\n4: Low received signal strength\n5: Out of memory\n6: SMS failure\n7: IP connectivity failure\n8: Peripheral malfunction\n\nWhen the single Device Object Instance is initiated, there is only one error code Resource Instance whose value is equal to 0 that means no error. When the first error happens, the LWM2M Client changes error code Resource Instance to any non-zero value to indicate the error type. When any other error happens, a new error code Resource Instance is created.\nThis error code Resource MAY be observed by the LWM2M Server. How to deal with LWM2M Client's error report depends on the policy of the LWM2M Server."
       },
       "12": {
         "id": 12,
@@ -535,7 +535,7 @@
         "type": "integer",
         "range": "",
         "units": "dBm",
-        "description": "This node contains the average value of the received signal strength indication used in the current network bearer in case Network Bearer Resource indicates a Cellular Network (RXLEV range 0…64) 0 is \u0026lt; 110dBm, 64 is \u003e-48 dBm).\nRefer to [3GPP 44.018] for more details on Network Measurement Report encoding and [3GPP 45.008] or for Wireless Networks refer to the appropriate wireless standard."
+        "description": "This node contains the average value of the received signal strength indication used in the current network bearer in case Network Bearer Resource indicates a Cellular Network (RXLEV range 0..64) 0 is < 110dBm, 64 is > -48 dBm).\nRefer to [3GPP 44.018] for more details on Network Measurement Report encoding and [3GPP 45.008] or for Wireless Networks refer to the appropriate wireless standard."
       },
       "3": {
         "id": 3,
@@ -546,7 +546,7 @@
         "type": "integer",
         "range": "",
         "units": "",
-        "description": "This contains received link quality  e.g., LQI for IEEE 802.15.4, (Range (0..255)), RxQual Downlink (for GSM range is 0…7).\nRefer to [3GPP 44.018] for more details on Network Measurement Report encoding."
+        "description": "This contains received link quality  e.g., LQI for IEEE 802.15.4, (Range (0..255)), RxQual Downlink (for GSM range is 0..7).\nRefer to [3GPP 44.018] for more details on Network Measurement Report encoding."
       },
       "4": {
         "id": 4,
@@ -568,7 +568,7 @@
         "type": "string",
         "range": "",
         "units": "",
-        "description": "The IP address of the next-hop IP router.\nNote: This IP Address doesn’t indicate the Server IP address."
+        "description": "The IP address of the next-hop IP router.\nNote: This IP Address doesn't indicate the Server IP address."
       },
       "6": {
         "id": 6,
@@ -601,7 +601,7 @@
         "type": "integer",
         "range": "",
         "units": "",
-        "description": "Serving Cell ID in case Network Bearer Resource is a Cellular Network.\nAs specified in TS [3GPP 23.003] and in [3GPP. 24.008]. Range (0…65535) in GSM/EDGE\nUTRAN Cell ID has a length of 28 bits.\nCell Identity  in WCDMA/TD-SCDMA. Range: (0..268435455).\nLTE Cell ID has a length of 28 bits.\nParameter definitions in [3GPP 25.331]."
+        "description": "Serving Cell ID in case Network Bearer Resource is a Cellular Network.\nAs specified in TS [3GPP 23.003] and in [3GPP. 24.008]. Range (0..65535) in GSM/EDGE\nUTRAN Cell ID has a length of 28 bits.\nCell Identity  in WCDMA/TD-SCDMA. Range: (0..268435455).\nLTE Cell ID has a length of 28 bits.\nParameter definitions in [3GPP 25.331]."
       },
       "9": {
         "id": 9,
@@ -612,7 +612,7 @@
         "type": "integer",
         "range": "",
         "units": "%",
-        "description": "Serving Mobile Network Code. In case Network Bearer Resource has 0(cellular network). Range (0…999).\nAs specified in TS [3GPP 23.003]."
+        "description": "Serving Mobile Network Code. In case Network Bearer Resource has 0(cellular network). Range (0..999).\nAs specified in TS [3GPP 23.003]."
       },
       "10": {
         "id": 10,
@@ -623,7 +623,7 @@
         "type": "integer",
         "range": "",
         "units": "",
-        "description": "Serving Mobile Country Code. In case Network Bearer Resource has 0 (cellular network). Range (0…999).\nAs specified in TS [3GPP 23.003]."
+        "description": "Serving Mobile Country Code. In case Network Bearer Resource has 0 (cellular network). Range (0..999).\nAs specified in TS [3GPP 23.003]."
       }
     }
   },
@@ -879,7 +879,7 @@
         "type": "integer",
         "range": "0-2",
         "units": "",
-        "description": "State of the device:\n0: unlocked state\nNormal operation.\n1: partially locked state\nTo render the device inoperable the device has been partially locked. The “lock target” resource allows specifying the target(s) for this operation.\n2: fully locked state\nTo render the device fully inoperable the device has been fully locked."
+        "description": "State of the device:\n0: unlocked state\nNormal operation.\n1: partially locked state\nTo render the device inoperable the device has been partially locked. The 'lock target' resource allows specifying the target(s) for this operation.\n2: fully locked state\nTo render the device fully inoperable the device has been fully locked."
 			},
 			"1": {
         "id": 1,
@@ -1097,7 +1097,7 @@
         "type": "objlnk",
         "range": "",
         "units": "",
-        "description": "Link to “Package Settings” object which allows to modify at any time software configuration settings. This is an application specific object.\nNote: OMA might provide a template for a Package Settings object in a future release of this specification."
+        "description": "Link to 'Package Settings' object which allows to modify at any time software configuration settings. This is an application specific object.\nNote: OMA might provide a template for a Package Settings object in a future release of this specification."
       }
     }
   }
