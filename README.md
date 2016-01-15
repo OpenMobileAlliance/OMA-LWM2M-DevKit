@@ -24,12 +24,13 @@ The OMA LWM2M DevKit is published on the Mozilla [Add-ons for Firefox](https://a
 ### Developer version
 The developer version uses a cloned Git repository to directly inject the source code. This allows for the latest snapshot versions and customizations of the add-on. The installation process is as follows:
 1. Get the sources from Github: `clone git://github.com/OpenMobileAlliance/OMA-LWM2M-DevKit.git`
-2. Add a text file named `lwm2m-devkit@openmobilealliance.org` to your profile's extension directory. You can also use the [Profile Manager](https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles) to create a new profile for add-on development.
+2. Add a text file named `lwm2m-devkit@openmobilealliance.org` to your profile's extension directory. You can also use the [Profile Manager](https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles) to create a new profile for add-on development first.
  - Windows: `C:\Users\<username>\AppData\Roaming\Mozilla\Firefox\Profiles\xxxxxxxx.default\extensions\`
  - Linux: `~/.mozilla/firefox/xxxxxxxx.default/extensions/`
  - MacOS: `~/Library/Application Support/Firefox/Profiles/xxxxxxxx.default/extensions/`
-5. Write the path to the DevKit sources (i.e., the directory that contains `install.rdf` and `chrome.manifest`) into that file.
-6. (Re-)start Firefox and allow the installation of this add-on.
+3. Write the path to the DevKit sources (i.e., the directory that contains `install.rdf` and `chrome.manifest`) into that file.
+4. Since Firefox 43 you need to **allow unsigned add-ons** by opening [about:config](about:config) and setting `xpinstall.signatures.required` to false.
+5. (Re-)start Firefox and allow the installation of this add-on.
 
 ## Usage
 ### Launching the OMA LWM2M DevKit
