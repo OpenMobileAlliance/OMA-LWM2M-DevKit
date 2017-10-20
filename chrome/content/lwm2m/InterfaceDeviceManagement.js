@@ -159,7 +159,7 @@ Lwm2mDevKit.DeviceManagement.handleRead = function(message) {
 				if (pl) pl = new String(1);
 				else    pl = new String(0);
 			}
-			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TEXT;
+			cf = Lwm2mDevKit.Copper.CONTENT_TYPE_TEXT_PLAIN;
 			
 		} else {
 			message.respond(Lwm2mDevKit.Copper.CODE_4_00_BAD_REQUEST, "Not Acceptable");
